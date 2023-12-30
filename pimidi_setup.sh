@@ -31,20 +31,20 @@ echo 4. Installing OPi.GPIO
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
 pip install RPi.GPIO
 
-echo 4. Installing python3 oled support
-# This is a bit long winded, needs python3 graphic and font support for OLED functions
-# takes a while on liile OPI zero - grab a coffee
-# see https://luma-oled.readthedocs.io/en/latest/software.html
-# and https://pillow.readthedocs.io/en/latest/installation.html 
-# echo 4a. OLED Installing python3-dev if needed
-# apt install -y python3-dev 
+echo 4. Installing python oled library
+# https://luma-oled.readthedocs.io/en/latest/intro.html 
+# Make sure you use raspi-config to set interface options-> I2C to be enabled 
+# Use i2cdetect to make sure you see the i2c device on the I2C 1 bus (Pins 3 and 5)  
+# i2cdetect -y 1
 echo 4b. OLED Installing libjpeg-dev zlib1g-dev
-apt install -y libjpeg-dev zlib1g-dev
+sudo apt install  python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 echo 4c. OLED Installing luma.oled
-pip3 install --upgrade luma.oled 
+pip install --upgrade luma.oled
+# Give pi user access to i2c
+sudo usermod -a -G spi,gpio,i2c pi
 
 echo 5. Installing midi library for python
 # Note: Uses /dev/ttyS2 so make sure UART2 is enables using armbian-config
 # Using https://github.com/edthrn/py-midi 
-pip3 install py-midi 
+pip install py-midi 
 date
