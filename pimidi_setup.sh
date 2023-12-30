@@ -13,8 +13,8 @@ sudo apt upgrade -y
 
 echo 2. Install git and set name and email
 sudo apt install git
-git config --global user.name "somervda"
-git config --global user.email "davidsomerville@comcast.net"
+git config --global user.name ""
+git config --global user.email ""
 
 
 echo 3. Rationalizing Python Version Names
@@ -44,7 +44,7 @@ pip install --upgrade luma.oled
 sudo usermod -a -G spi,gpio,i2c pi
 
 echo 5. Installing midi library for python
-# Note: Uses /dev/ttyS2 so make sure UART2 is enables using armbian-config
+# Note: Uses /dev/serial0 so make sure serial is enabled using raspi-config
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi 
 date
