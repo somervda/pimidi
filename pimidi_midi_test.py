@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Using https://github.com/edthrn/py-midi as simple midi to serial port interface
-# Make sure seria0 is enanbled by using the raspi-config utility and going to
+# Make sure serial0 is enanbled by using the raspi-config utility and going to
 # periferals ->serial (Dont turn on logon shell but do enable serial)
 #  On a rpi zero 2w it show up as /dev/serial0
 # Set the baud rate by typing  stty -F /dev/serial0 ospeed 31250 (Set to output at midi baud rate)

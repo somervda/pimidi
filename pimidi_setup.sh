@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
-# Install prerequisits for OPI Midi functionality
-# Make sure python3 and pip are installed
+# Install prerequisits for PI Midi functionality
 # Make sure apt is updated and we have the latest package lists before we start
-# This whole script takes a while on aOPi zero - maybe 10 minutes
-# Remember to 'chmod u+x opimidi_setup.sh' tobe able to run this file 
-# then 'bash opimidi_setup.sh'
+# Remember to 'chmod u+x opimidi_setup.sh' to be able to run this script 
+# then 'bash pimidi_setup.sh'
 
 date
 echo 1. Updating and Upgrade apt packages 
 sudo apt update -y
 sudo apt upgrade -y
 
-echo 2. Install git and set name and email
+echo 2. Install git and set name and email (Add your github info)
 sudo apt install git
 git config --global user.name ""
 git config --global user.email ""
@@ -44,7 +42,8 @@ pip install --upgrade luma.oled
 sudo usermod -a -G spi,gpio,i2c pi
 
 echo 5. Installing midi library for python
-# Note: Uses /dev/serial0 so make sure serial is enabled using raspi-config
+# Make sure serial0 is enanbled by using the raspi-config utility and going to
+# periferals ->serial (Dont turn on logon shell but do enable serial)
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi 
 date
