@@ -8,6 +8,13 @@ User=pi
 Type=idle
 # Use ExecStartPre to make sure network can connect before running python application
 ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
-ExecStart=/usr/bin/python /home/pi/pimidi/pimidi_getIp.py
+ExecStart=/usr/bin/python /home/pi/pimidi/pimidi.py
 
 [Install]
+
+# 
+# Steps to enable the service
+# Add pimidi.service to the /lib/systemd/system/ folder
+# sudo chmod 644 /lib/systemd/system/pimidi
+# sudo systemctl enable pimidi.service
+# sudo systemctl daemon-reload

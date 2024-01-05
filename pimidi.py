@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+# Main pimidi program started by the systemctrl pimidi.service 
+# Tasks
+# - Show the IP and hostname of the pimidi device (Indicates the device can be used)
+# - Start the flask services
+
 import socket
 import os
 gw = os.popen("ip -4 route show default").read().split()
