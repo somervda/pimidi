@@ -16,7 +16,7 @@ git config --global user.name ""
 git config --global user.email ""
 
 
-echo 3. Installingand rationalizing Python Version Names
+echo 3. Installing and rationalizing Python Version Names
 sudo apt install -y python-is-python3
 sudo apt install -y python3-pip
 sudo apt install -y python-dev-is-python3
