@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install prerequisits for PI Midi functionality
 # Make sure apt is updated and we have the latest package lists before we start
-# Remember to 'chmod u+x opimidi_setup.sh' to be able to run this script 
+# Remember to 'chmod u+x pimidi_setup.sh' to be able to run this script 
 # then 'bash pimidi_setup.sh'
 
 date
@@ -9,14 +9,16 @@ echo 1. Updating and Upgrade apt packages
 sudo apt update -y
 sudo apt upgrade -y
 
-echo 2. Install git and set name and email (Add your github info)
-sudo apt install git
+echo 2. Install git and set name and email
+# Add your github info
+sudo apt -y install git
 git config --global user.name ""
 git config --global user.email ""
 
 
-echo 3. Rationalizing Python Version Names
+echo 3. Installingand rationalizing Python Version Names
 sudo apt install -y python-is-python3
+sudo apt install -y python3-pip
 sudo apt install -y python-dev-is-python3
 
 python --version
