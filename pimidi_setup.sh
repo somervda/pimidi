@@ -31,21 +31,30 @@ echo 4. Installing OPi.GPIO
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
 pip install RPi.GPIO
 
-echo 4. Installing python oled library
+echo 5. Installing python oled library
 # https://luma-oled.readthedocs.io/en/latest/intro.html 
 # Make sure you use raspi-config to set interface options-> I2C to be enabled 
 # Use i2cdetect to make sure you see the i2c device on the I2C 1 bus (Pins 3 and 5)  
 # i2cdetect -y 1
-echo 4b. OLED Installing libjpeg-dev zlib1g-dev
+echo 5b. OLED Installing libjpeg-dev zlib1g-dev
 sudo apt install  python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-echo 4c. OLED Installing luma.oled
+echo 5c. OLED Installing luma.oled
 pip install --upgrade luma.oled
 # Give pi user access to i2c
 sudo usermod -a -G spi,gpio,i2c pi
 
-echo 5. Installing midi library for python
+echo 6. Installing midi library for python
 # Make sure serial0 is enanbled by using the raspi-config utility and going to
 # periferals ->serial (Dont turn on logon shell but do enable serial)
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi 
+
+
+# Add pimidi.service to the /lib/systemd/system/ folder
+echo 7. Setup the pimidi.service to run on startup
+sudo cp pimidi.service /lib/systemd/system/pimidi.service
+sudo chmod 644 /lib/systemd/system/pimidi.service
+sudo systemctl enable pimidi.service
+sudo systemctl daemon-reload
+
 date
