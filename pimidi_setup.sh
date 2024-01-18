@@ -42,6 +42,9 @@ echo 4b. OLED Installing libjpeg-dev zlib1g-dev
 sudo apt install  python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
 echo 4c. OLED Installing luma.oled
 pip install --upgrade luma.oled
+echo 4d. Install i2c utilities
+#  Can run i2c scans i.e. 'i2cdetect -y 1'
+sudo apt-get install i2c-tools
 # Give pi user access to i2c
 sudo usermod -a -G spi,gpio,i2c pi
 
