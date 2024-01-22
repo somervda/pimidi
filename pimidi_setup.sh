@@ -33,22 +33,24 @@ echo 3. Installing OPi.GPIO
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
 pip install RPi.GPIO
 
-echo 4. Installing python oled library
-# https://luma-oled.readthedocs.io/en/latest/intro.html 
-# Make sure you use raspi-config to set interface options-> I2C to be enabled 
+echo 4. Installing python i2c and oled support
+# Adafruit version (Circuit python and python)
+# https://github.com/adafruit/Adafruit_CircuitPython_SSD1306/tree/main 
 # Use i2cdetect to make sure you see the i2c device on the I2C 1 bus (Pins 3 and 5)  
 # i2cdetect -y 1
-echo 4b. OLED Installing libjpeg-dev zlib1g-dev
-sudo apt install  python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-echo 4c. OLED Installing luma.oled
-pip install --upgrade luma.oled
-echo 4d. Install i2c utilities
-#  Can run i2c scans i.e. ''
+echo 4a. Install i2c utilities
+#  Can run i2c scans i.e. 'i2cdetect -y 1'
 sudo apt-get install i2c-tools
 # Give pi user access to i2c
 sudo usermod -a -G spi,gpio,i2c pi
+echo 4b. OLED Installing adafruit i2c and oled support
+pip3 install adafruit-circuitpython-ssd1306
 
-echo 5. Installing midi library for python
+echo 5. Install adafruit mcp4725 DAC support
+# See https://github.com/adafruit/Adafruit_CircuitPython_MCP4725 
+pip3 install adafruit-circuitpython-mcp4725
+
+echo 6. Installing midi library for python
 # Make sure serial0 is enanbled by using the raspi-config utility and going to
 # periferals ->serial (Dont turn on logon shell but do enable serial)
 # Using https://github.com/edthrn/py-midi 
@@ -56,7 +58,7 @@ pip install py-midi
 
 
 # Add pimidi.service to the /lib/systemd/system/ folder
-echo 6. Setup the pimidi.service to run on startup
+echo 7. Setup the pimidi.service to run on startup
 sudo cp pimidi.service /lib/systemd/system/pimidi.service
 sudo chmod 644 /lib/systemd/system/pimidi.service
 sudo systemctl enable pimidi.service

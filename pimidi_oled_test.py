@@ -1,29 +1,30 @@
 #!/usr/bin/python3
 
-# https://luma-oled.readthedocs.io/en/latest/intro.html 
-# Install i2ctools
-# sudo apt install -y i2c-tools
-# i2cdetect -y 1
-# install oled (Luma oled library - quite a few prerequisits)
-# sudo apt-get install  python3-pil libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libtiff5 -y
-# pip3 install --upgrade luma.oled
-# sudo usermod -a -G spi,gpio,i2c pi
+# Basic example of clearing and drawing pixels on a SSD1306 OLED display.
+# This example and library is meant to work with Adafruit CircuitPython API.
+# Author: Tony DiCola
+# License: Public Domain
+
+# Import all board pins.
+from board import SCL, SDA
+import busio
+
+# Import the SSD1306 module.
+import adafruit_ssd1306
 
 
-from luma.core.interface.serial import i2c
-from luma.core.render import canvas
-from luma.oled.device import ssd1306
-import time
+# Create the I2C interface.
+i2c = busio.I2C(SCL, SDA)
 
-def do_nothing(obj):
-    pass
+# Create the SSD1306 OLED class.
+# The first two parameters are the pixel width and pixel height.  Change these
+# to the right size for your display!
+display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+# Clear the display.  Always call show after changing pixels to make the display
+# update visible!
+display.fill(0)
 
-serial = i2c(port=1, address=0x3c)
-device = ssd1306(serial)
-device.cleanup = do_nothing
-device.show
-with canvas(device) as draw:
-    draw.rectangle(device.bounding_box, outline="white",fill="black")
-    draw.text((30, 30), "Hello World", fill="white")
-time.sleep(3)
-device.hide()
+display.show()
+
+display.text("hello world", 0, 0, 1)
+display.show()
