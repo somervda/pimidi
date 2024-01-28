@@ -25,6 +25,7 @@ display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
 display.fill(0)
 
 display.show()
-
+# Note: See framebuf documentation here
+# https://docs.circuitpython.org/projects/framebuf/en/latest/ 
 display.text("hello world", 0, 0, 1)
 display.show()

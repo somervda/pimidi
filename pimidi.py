@@ -6,6 +6,10 @@
 
 import socket
 import os
+
+import sys
+sys.path.append("/home/pi/pimidi")
+
 gw = os.popen("ip -4 route show default").read().split()
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect((gw[2], 0))
@@ -14,18 +18,17 @@ gateway = gw[2]
 host = socket.gethostname()
 print ("IP:", ipaddr, " GW:", gateway, " Host:", host)
 
-from luma.core.interface.serial import i2c
-from luma.core.render import canvas
-from luma.oled.device import ssd1306
-import time
-
-def do_nothing(obj):
-    pass
-
-serial = i2c(port=1, address=0x3c)
-device = ssd1306(serial)
-device.cleanup = do_nothing
-device.show
-with canvas(device) as draw:
-    draw.text((0, 0), host, fill="white")
-    draw.text((0, 15), ipaddr, fill="white")
+# Import all board pins.
+from board import SCL, SDA
+import busio
+# Import the SSD1306 module.
+import adafruit_ssd1306
+# Create the I2C interface.
+i2c = busio.I2C(SCL, SDA)
+display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+display.fill(0)
+display.show()
+# Note I forced the filename of the font , when run with systemd
+# the framebuffer was not finding the font in the default location
+display.text(ipaddr, 20, 0, 1,font_name="/home/pi/pimidi/font5x8.bin")
+display.show()

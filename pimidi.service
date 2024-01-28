@@ -3,7 +3,7 @@ Description=Pi Midi Startup Service
 # Note: Also use ExecStartPre to make sure network is up
 After=network-online.target
 [Service]
-WorkingDirectory=/home/pi/
+WorkingDirectory=/home/pi/pimidi
 User=pi
 Type=idle
 # Use ExecStartPre to make sure network can connect before running python application
@@ -17,5 +17,10 @@ WantedBy=multi-user.target
 # Steps to enable the service
 # Add pimidi.service to the /lib/systemd/system/ folder
 # sudo chmod 644 /lib/systemd/system/pimidi.service
-# sudo systemctl enable pimidi.service
+# 
 # sudo systemctl daemon-reload
+# Check the system log to see if the service ran with
+# tail -f -n 1000 /var/log/syslog | grep python 
+
+
+
