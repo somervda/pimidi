@@ -30,6 +30,14 @@ class MidiIO:
   @property
   def cv_min_hertz(self): 
       return self.settings["cv"]["min_hertz"]
+  
+  @property
+  def midi_display(self): 
+      return self.settings["midi"]["display"]
+  
+  @property
+  def midi_default_channel(self): 
+      return self.settings["midi"]["default_channel"]
 
 # setters
   @cv_max_volts.setter 
@@ -49,6 +57,17 @@ class MidiIO:
       if(hertz < 8.16 or hertz > 13289.75): 
         raise ValueError("Midi only supports a frequency range of 8.16 to 13289.75 hertz") 
       self.settings["cv"]["min_hertz"]=hertz
+
+  @midi_display.setter
+  def midi_display(self, display): 
+      self.settings["midi"]["display"]=display
+
+  @midi_default_channel.setter
+  def midi_default_channel(self, channel): 
+      if(channel < 0 or channel > 15): 
+        raise ValueError("Midi only supports channels 0 to 15") 
+      self.settings["midi"]["default_channel"]=channel
+
 
   def settingsPrint(self):
     print(self.settings)
