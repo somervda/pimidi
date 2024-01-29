@@ -2,7 +2,7 @@
     "cv": {
         "max_volts": 4.5,
         "midi_channel": 2,
-        "min_hertz": 330
+        "min_hertz": 130
     },
     "midi": {
         "display": false,
