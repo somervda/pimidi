@@ -56,9 +56,13 @@ echo 6. Installing midi library for python
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi 
 
+echo 7. Install fastapi for web services and a ASGI web server
+pip install fastapi
+pip install "uvicorn[standard]"
+
 
 # Add pimidi.service to the /lib/systemd/system/ folder
-echo 7. Setup the pimidi.service to run on startup
+echo 8. Setup the pimidi.service to run on startup
 sudo cp pimidi.service /lib/systemd/system/pimidi.service
 sudo chmod 644 /lib/systemd/system/pimidi.service
 sudo systemctl enable pimidi.service
