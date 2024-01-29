@@ -1,8 +1,22 @@
 #!/usr/bin/python3
 
+import time
+import asyncio
+
 from midiio import MidiIO
 
-o = MidiIO()
+async def main():
+    o = MidiIO()
+
+    print("start")
+    task = asyncio.create_task(o.notePlay(44,1))
+    print("end")
+    await task
+    print("finish")
+
+
+asyncio.run(main())
+
 # print(o.cv_max_volts)
 # o.cv_max_volts=4.5
 # print(o.cv_midi_channel)

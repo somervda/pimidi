@@ -3,10 +3,30 @@
 # Main wrapper for py_midi, ssd1306, mcp4725 and GPIO functionality
 import json
 import math
+import asyncio
+
+# DAC, Midi, OLED and GPIO libraries
+import RPi.GPIO as GPIO
+import board
+import busio
+
+from midi import MidiConnector
+from midi import NoteOn
+from midi import NoteOff
+from midi import Message
+
+import adafruit_mcp4725
+import adafruit_ssd1306
+import time
 
 
 class MidiIO:
     MIDINOTE127 = 12543.85
+    # Initialize I2C bus.
+    i2c = busio.I2C(board.SCL, board.SDA)
+    # Initialize MCP4725.
+    dac = adafruit_mcp4725.MCP4725(i2c, address=0x60)
+    i2c = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
 
     def __init__(self):
         # Load pimidi.config (json file)
@@ -16,11 +36,34 @@ class MidiIO:
         except IOError as e:
             print("I/O error({0}): {1}".format(e.strerror, e.filename))
         self.cvSettup()
+        self.conn = MidiConnector('/dev/serial0')
 
     def settingsSave(self):
         with open("settings.json", "w") as settings_file:
             json_settings = json.dumps(self.settings, indent=4)
             settings_file.write(json_settings)
+
+    def noteOn(self,note,channel=None,velocity=127):
+        # print("note On",note)
+        if channel==None:
+            channel=self.midi_default_channel
+        noteOn = NoteOn(note, velocity)
+        msg = Message(noteOn, channel=channel)
+        self.conn.write(msg)
+
+    def noteOff(self,note,channel=None,velocity=127):
+        # print("Note off",note)
+        if channel==None:
+            channel=self.midi_default_channel
+        noteOff = NoteOff(note, velocity)
+        msg = Message(noteOff, channel=channel)
+        self.conn.write(msg)
+
+    async def notePlay(self,note,duration,channel=None,velocity=127):
+        self.noteOn(note,channel=channel,velocity=velocity)
+        await asyncio.sleep(duration)
+        self.noteOff(note,channel=channel,velocity=velocity)
+
 
 # getters
 
@@ -74,6 +117,7 @@ class MidiIO:
             raise ValueError("Midi only supports channels 0 to 15")
         self.settings["midi"]["default_channel"] = channel
 
+
     def cvSettup(self):
         # etFreqStep is the ratio in hertz between 2 adjacent notes in the equal temperament scale (12th root of 2)
         self.etFreqRatio = math.pow(2, 1/12)
@@ -81,8 +125,6 @@ class MidiIO:
         # The ratio in hertz between 2 adjacent dac values going to logarithmic oscillators
         self.cvfreqRatio = math.pow(2, 1/(4095/self.cv_max_volts))
         self.cvMinHertzNoteAndOffset()
-        print("self.cv_first_midi_note", self.cv_first_midi_note)
-        print("self.dacOffset", self.dacOffset)
 
     def cvMinHertzNoteAndOffset(self):
         # Find the first midi note above the cv_min_hertz
