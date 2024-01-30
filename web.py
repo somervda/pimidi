@@ -14,8 +14,13 @@ from typing import Union
 
 from fastapi import FastAPI
 
+o = MidiIO()
 app = FastAPI()
 
+@app.get("/playNote/{note}")
+async def play_note(note:int):
+    task = asyncio.create_task(o.notePlay(note,1))
+    return{1}
 
 @app.get("/")
 async def read_root():
