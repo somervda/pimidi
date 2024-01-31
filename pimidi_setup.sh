@@ -32,9 +32,9 @@ echo 3. Installing OPi.GPIO
 # see https://pypi.org/project/RPi.GPIO/ and https://sourceforge.net/p/raspberry-gpio-python/wiki/Home/ 
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
 pip install RPi.GPIO
-# Enable i2c
+# Enable i2c hardware
 sudo raspi-config nonint do_i2c 0
-# Enable serial but not console thru serial
+# Enable serial hardware but not console thru serial
 sudo raspi-config nonint do_serial 2
 
 echo 4. Installing python i2c and oled support
@@ -55,14 +55,14 @@ echo 5. Install adafruit mcp4725 DAC support
 pip3 install adafruit-circuitpython-mcp4725
 
 echo 6. Installing midi library for python
-# Make sure serial0 is enanbled by using the raspi-config utility and going to
-# periferals ->serial (Dont turn on logon shell but do enable serial)
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi 
 
 echo 7. Install fastapi for web services and a ASGI web server
 pip install fastapi
 pip install "uvicorn[standard]"
+# Note: I run uvicorn using this command during development
+# uvicorn web:app --reload --host pimidi.home
 
 
 # Add pimidi.service to the /lib/systemd/system/ folder
