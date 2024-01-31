@@ -32,6 +32,10 @@ echo 3. Installing OPi.GPIO
 # see https://pypi.org/project/RPi.GPIO/ and https://sourceforge.net/p/raspberry-gpio-python/wiki/Home/ 
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
 pip install RPi.GPIO
+# Enable i2c
+sudo raspi-config nonint do_i2c 0
+# Enable serial but not console thru serial
+sudo raspi-config nonint do_serial 2
 
 echo 4. Installing python i2c and oled support
 # Adafruit version (Circuit python and python)
