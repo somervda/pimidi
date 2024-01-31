@@ -3,7 +3,7 @@
 # Before running this file do the following on the raspbery pi
 # Add git and your git info
 # sudo apt -y install git
-# git config --global user.name ""
+# git config --global user.name "pimidi"
 # git config --global user.email ""
 # git clone https://github.com/somervda/pimidi.git
 # This file will now be in the pimidi folder
