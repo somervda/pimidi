@@ -44,7 +44,7 @@ echo 4. Installing python i2c and oled support
 # i2cdetect -y 1
 echo 4a. Install i2c utilities
 #  Can run i2c scans i.e. 'i2cdetect -y 1'
-sudo apt-get install i2c-tools
+sudo apt-get install -y i2c-tools
 # Give pi user access to i2c
 sudo usermod -a -G spi,gpio,i2c pi
 echo 4b. OLED Installing adafruit i2c and oled support
