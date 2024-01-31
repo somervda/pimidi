@@ -26,7 +26,7 @@ class MidiIO:
     i2c = busio.I2C(board.SCL, board.SDA)
     # Initialize MCP4725.
     dac = adafruit_mcp4725.MCP4725(i2c, address=0x60)
-    i2c = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+    display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
 
     def __init__(self):
         # Load pimidi.config (json file)
@@ -144,3 +144,14 @@ class MidiIO:
 
     def settingsPrint(self):
         print(self.settings)
+
+    def oledText(self,x,y,text,refresh=False):
+        if refresh:
+            self.display.fill(0)
+            self.display.show()
+        # Note I forced the filename of the font , when run with systemd
+        # the framebuffer was not finding the font in the default location
+        # See https://github.com/adafruit/Adafruit_CircuitPython_framebuf/blob/main/adafruit_framebuf.py 
+        # fir details of frambuf usage
+        self.display.text(text, x, y, 1,font_name="/home/pi/pimidi/font5x8.bin",size=1)
+        self.display.show()

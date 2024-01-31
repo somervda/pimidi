@@ -1,0 +1,21 @@
+[Unit]
+Description=PiMidi Webservice Startup (Runs Uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+DynamicUser=true
+
+WorkingDirectory=/home/pi/pimidi
+PrivateTmp=true
+
+# EnvironmentFile=/srv/jingus.example.com/secrets/env
+
+ExecStart=/home/pi/.local/bin/uvicorn \
+        --host pimidi.home web:app
+
+
+[Install]
+WantedBy=multi-user.target

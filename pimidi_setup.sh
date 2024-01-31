@@ -65,11 +65,10 @@ pip install "uvicorn[standard]"
 # uvicorn web:app --reload --host pimidi.home
 
 
-# Add pimidi.service to the /lib/systemd/system/ folder
-echo 8. Setup the pimidi.service to run on startup
-sudo cp pimidi.service /lib/systemd/system/pimidi.service
-sudo chmod 644 /lib/systemd/system/pimidi.service
-sudo systemctl enable pimidi.service
-sudo systemctl daemon-reload
+# Add pimidi_uvicorn.service to the /lib/systemd/system/ folder
+echo 8. Setup the pimidi_uvicorn.service to run on startup 
+sudo cp pimidi_uvicorn.service /lib/systemd/system/pimidi_uvicorn.servic
+sudo systemctl enable pimidi_uvicorn.service
+sudo systemctl start pimidi_uvicorn.service
 
 date
