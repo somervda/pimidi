@@ -2,12 +2,13 @@
 Description=Pi Midi Startup Service
 # Note: Also use ExecStartPre to make sure network is up
 After=network-online.target
+Wants=network-online.target
 [Service]
 WorkingDirectory=/home/pi/pimidi
 User=pi
 Type=idle
 # Use ExecStartPre to make sure network can connect before running python application
-ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
+# ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
 ExecStart=/usr/bin/python /home/pi/pimidi/pimidi.py
 
 [Install]
