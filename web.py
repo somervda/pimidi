@@ -1,32 +1,42 @@
 #!/usr/bin/python3
 
 # The main entrypoint for the pimidi application
-# Runs a flask server to accept web service calls
+# Runs in a fastAPI server to accept web service calls
 
 import sys
 import time
 import asyncio
 from midiio import MidiIO
 
-
-
-from typing import Union
-
-from fastapi import FastAPI
+# fastAPI 
+from typing import Union,Annotated
+from fastapi import FastAPI,Path
 
 o = MidiIO()
 app = FastAPI()
 
-@app.get("/playNote/{note}")
-async def play_note(note:int):
-    task = asyncio.create_task(o.notePlay(note,1))
-    return{1}
+@app.get("/playNote/{note}/{durationMs}")
+async def play_note(note: Annotated[int, Path(title="Midi note value",le=127)],
+durationMs:Annotated[int, Path(title="Milliseconds to play the note",ge=50,le=4000)]):
+    task = asyncio.create_task(o.notePlay(note,durationMs/1000))
+    return{True}
 
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+@app.get("/midiNoteOn/{note}")
+def midi_note_on(note: Annotated[int, Path(title="Midi note value",le=127)]):
+    o.noteOn(note)
+    return{True}
+
+@app.get("/midiNoteOff/{note}")
+def midi_note_off(note: Annotated[int, Path(title="Midi note value",le=127)]):
+    o.noteOff(note)
+    return{True}
+
+@app.get("/midiNoteReset")
+def midi_note_reset():
+    for n in range(1,127):
+        o.noteOff(n)
+    return{True}
+
+    
 
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
