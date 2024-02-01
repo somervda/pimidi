@@ -2,6 +2,7 @@
 
 # The main entrypoint for the pimidi application
 # Runs in a fastAPI server to accept web service calls
+# Note for testing 
 
 import sys
 import time
@@ -111,4 +112,31 @@ def set_cv_min_hertz(value: Annotated[float, Path(title="CV minimum hertz (Frequ
     o.settingsSave()
     # Recalc CV tuning and range
     o.cvSettup()
+    return True
+
+@app.get("/MidiDisplay")
+def get_midi_display():
+    if o.midi_display:
+        return(1)
+    else:
+        return(0)
+
+@app.get("/MidiDisplay/{value}")
+def set_midi_display(value: Annotated[int, Path(title="Show midi output on the display> (1=Yes,0=No)",le=1,ge=0)]):
+    if (value==1):
+        o.midi_display = True
+    else:
+        o.midi_display = False
+    o.settingsSave()
+    return True
+
+@app.get("/MidiDefaultChannel")
+def get_midi_default_channel():
+    return(o.midi_default_channel)
+
+
+@app.get("/MidiDefaultChannel/{value}")
+def set_midi_default_channel(value: Annotated[int, Path(title="Default Midi channel",le=16,ge=1)]):
+    o.mmidi_default_channel = True
+    o.settingsSave()
     return True
