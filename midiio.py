@@ -113,8 +113,8 @@ class MidiIO:
 
     @midi_default_channel.setter
     def midi_default_channel(self, channel):
-        if(channel < 0 or channel > 15):
-            raise ValueError("Midi only supports channels 0 to 15")
+        if(channel < 1 or channel > 16):
+            raise ValueError("Midi only supports channels 1 to 16")
         self.settings["midi"]["default_channel"] = channel
 
 

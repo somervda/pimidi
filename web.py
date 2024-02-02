@@ -137,6 +137,6 @@ def get_midi_default_channel():
 
 @app.get("/MidiDefaultChannel/{value}")
 def set_midi_default_channel(value: Annotated[int, Path(title="Default Midi channel",le=16,ge=1)]):
-    o.mmidi_default_channel = True
+    o.midi_default_channel = value
     o.settingsSave()
     return True

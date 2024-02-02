@@ -6,6 +6,6 @@
     },
     "midi": {
         "display": true,
-        "default_channel": 1
+        "default_channel": 8
     }
 }
