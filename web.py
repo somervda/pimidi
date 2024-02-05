@@ -3,6 +3,7 @@
 # The main entrypoint for the pimidi application
 # Runs in a fastAPI server to accept web service calls
 # Note for testing 
+# uvicorn web:app --reload --host pimidi.local
 
 import sys
 import time
@@ -12,6 +13,8 @@ from midiio import MidiIO
 # fastAPI 
 from typing import Union,Annotated
 from fastapi import FastAPI,Path
+from fastapi.staticfiles import StaticFiles
+
 
 # Get IP address
 import socket
@@ -20,6 +23,7 @@ import os
 
 o = MidiIO()
 app = FastAPI()
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # Show the IP address
 gw = os.popen("ip -4 route show default").read().split()
@@ -27,6 +31,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect((gw[2], 0))
 ipaddr = s.getsockname()[0]
 o.oledText(20,1,ipaddr,refresh=True)
+
+
+
+
 
 @app.get("/playNote/{note}/{durationMs}")
 async def play_note(note: Annotated[int, Path(title="Midi note value",le=127)],
