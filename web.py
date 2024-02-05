@@ -23,7 +23,7 @@ import os
 
 o = MidiIO()
 app = FastAPI()
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
 
 # Show the IP address
 gw = os.popen("ip -4 route show default").read().split()
@@ -148,3 +148,7 @@ def set_midi_default_channel(value: Annotated[int, Path(title="Default Midi chan
     o.midi_default_channel = value
     o.settingsSave()
     return True
+
+# Note: Make sure this line is at thye end of the file so fastAPI falls through the other
+# routes before serving up static files 
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
