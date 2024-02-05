@@ -15,8 +15,15 @@ from midi import NoteOn
 from midi import NoteOff
 from midi import Message
 
-import adafruit_mcp4725
-import adafruit_ssd1306
+try:
+    import adafruit_mcp4725
+except:
+    print("Import adafruit_mcp4725 failed")
+try:
+    import adafruit_ssd1306
+except:
+    print("Import adafruit_ssd1306 failed")
+
 import time
 
 
@@ -24,9 +31,12 @@ class MidiIO:
     MIDINOTE127 = 12543.85
     # Initialize I2C bus.
     i2c = busio.I2C(board.SCL, board.SDA)
-    # Initialize MCP4725.
-    dac = adafruit_mcp4725.MCP4725(i2c, address=0x60)
-    display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+    # Initialize I2C devices.
+    try:
+        dac = adafruit_mcp4725.MCP4725(i2c, address=0x60)
+        display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
+    except:
+        print("I2C device startup failed")
 
     def __init__(self):
         # Load pimidi.config (json file)
@@ -36,7 +46,10 @@ class MidiIO:
         except IOError as e:
             print("I/O error({0}): {1}".format(e.strerror, e.filename))
         self.cvSettup()
-        self.conn = MidiConnector('/dev/serial0')
+        try:
+            self.conn = MidiConnector('/dev/serial0')
+        except:
+            print("Midi connector setup failed")
 
     def settingsSave(self):
         with open("settings.json", "w") as settings_file:
