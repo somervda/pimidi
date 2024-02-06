@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 
 # Main wrapper for py_midi, ssd1306, mcp4725 and GPIO functionality
+# The wrapper also exposes the interface as a class and 
+# orchistrates some of the IO activities that work together
+# i.e. play midi and cv togther if both using the same midi channel
+
 import json
 import math
 import asyncio
@@ -15,6 +19,9 @@ from midi import NoteOn
 from midi import NoteOff
 from midi import Message
 
+# Wrap the I2C functions with try/except so the code will still
+# work if testing on a device that does not have I2C perferals
+# installed
 try:
     import adafruit_mcp4725
 except:
@@ -37,7 +44,6 @@ class MidiIO:
         display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3c)
     except:
         print("I2C device startup failed")
-
     def __init__(self):
         # Load pimidi.config (json file)
         try:
@@ -50,6 +56,8 @@ class MidiIO:
             self.conn = MidiConnector('/dev/serial0')
         except:
             print("Midi connector setup failed")
+
+# Main Midiio actions (Control notes, etc)
 
     def settingsSave(self):
         with open("settings.json", "w") as settings_file:
@@ -72,6 +80,8 @@ class MidiIO:
         msg = Message(noteOff, channel=channel)
         self.conn.write(msg)
 
+# Note: Use async wrapper for playNote this so noteOn and noteOff can happen in background
+# while pimidi is working on other requests.
     async def notePlay(self,note,duration,channel=None,velocity=127):
         self.noteOn(note,channel=channel,velocity=velocity)
         await asyncio.sleep(duration)
@@ -130,12 +140,13 @@ class MidiIO:
             raise ValueError("Midi only supports channels 1 to 16")
         self.settings["midi"]["default_channel"] = channel
 
+# Initialize CV range settings
 
     def cvSettup(self):
         # etFreqStep is the ratio in hertz between 2 adjacent notes in the equal temperament scale (12th root of 2)
         self.etFreqRatio = math.pow(2, 1/12)
 
-        # The ratio in hertz between 2 adjacent dac values going to logarithmic oscillators
+        # The ratio in hertz between 2 adjacent DAC values going to logarithmic oscillators
         self.cvfreqRatio = math.pow(2, 1/(4095/self.cv_max_volts))
         self.cvMinHertzNoteAndOffset()
 
@@ -155,8 +166,7 @@ class MidiIO:
     def getMidiNoteHertz(self, note):
         return self.MIDINOTE127/(math.pow(self.etFreqRatio, 127-note))
 
-    def settingsPrint(self):
-        print(self.settings)
+# Helper functions to simplify use of periferals
 
     def oledText(self,x,y,text,refresh=False):
         if refresh:
