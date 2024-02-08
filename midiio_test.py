@@ -13,10 +13,10 @@ async def main():
     task = asyncio.create_task(o.notePlay(44, 2))
     print("end noteplay")
     await task
-    for x in range(40, 72, 3):
+    for x in range(40, 72, 1):
         task = asyncio.create_task(o.notePlay(x, 0.1))
         await task
-        task = asyncio.create_task(o.notePlay(x + 2, 0.1))
+        task = asyncio.create_task(o.notePlay(x , 0.1))
         await task
         await asyncio.sleep(.2)
     print("finish main")

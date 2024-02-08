@@ -66,6 +66,7 @@ class MidiIO:
             self.conn = MidiConnector("/dev/serial0")
         except:
             print("Midi connector setup failed")
+        GPIO.setup(self.cvTriggerChannel,GPIO.OUT)
 
     # Main Midiio actions (Control notes, etc)
 
@@ -91,7 +92,7 @@ class MidiIO:
             self.oledShowNoteText(note)
 
     def cvNoteOn(self,note):
-        dacValue = self.dacMidiNoteValue(note)
+        dacValue = self.dacMidiNoteValue(note+3)
         if (dacValue >= 0 and dacValue <= 4095):
             self.dac.raw_value= dacValue
             GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
