@@ -37,11 +37,11 @@ import time
 class MidiIO:
     MIDINOTE127 = 12543.85
     # etFreqStep is the ratio in hertz between 2 adjacent notes in the equal temperament scale (12th root of 2)
-    self.etFreqRatio = math.pow(2, 1/12)
+    etFreqRatio = math.pow(2, 1/12)
     # If playing the cv in unison with the midi, the  cv_midi_offset will offset the cv note 
     # number of semitones from the midi note (Play harmony)
     # Runtime parameter not saved in settings. By default plays same note
-    cv_midi_offset = 0 
+    _cv_midi_offset = 0 
 
     # Initialize I2C bus.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -111,7 +111,7 @@ class MidiIO:
 
     @property
     def cv_midi_offset(self):
-        return self.cv_midi_offset
+        return self._cv_midi_offset
 
     @property
     def midi_display(self):
@@ -136,9 +136,9 @@ class MidiIO:
 
     @cv_midi_offset.setter
     def cv_midi_offset(self, offset):
-        if(offset < -24 or channel > 24):
+        if(offset < -24 or offset > 24):
             raise ValueError("CV offset can only be +/- 24 semitones")
-        self.cv_midi_offset = offset
+        self._cv_midi_offset = offset
 
     @cv_min_hertz.setter
     def cv_min_hertz(self, hertz):
