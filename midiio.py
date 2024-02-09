@@ -67,6 +67,7 @@ class MidiIO:
         except:
             print("Midi connector setup failed")
         GPIO.setup(self.cvTriggerChannel,GPIO.OUT)
+        GPIO.output(self.cvTriggerChannel,GPIO.LOW)
 
     # Main Midiio actions (Control notes, etc)
 

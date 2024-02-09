@@ -7,16 +7,17 @@ from midiio import MidiIO
 
 o = MidiIO()
 
+def simplePlay():
+    for x in range(50, 66, 3):
+        o.noteOn(x)
+        time.sleep(1)
+        o.noteOff(x)
 
 async def main():
     print("start noteplay")
-    task = asyncio.create_task(o.notePlay(44, 2))
+    task = asyncio.create_task(o.notePlay(50, 2))
     print("end noteplay - should see this before note finishes playing")
     await task
-    for x in range(50, 66, 3):
-        task = asyncio.create_task(o.notePlay(x, 0.2))
-        await task
-        # await asyncio.sleep(.02)
     print("finish main")
 
 print("* Basic getter, setter tests *")
@@ -34,19 +35,21 @@ o.cv_midi_offset = o.cv_midi_offset
 print("cv_midi_offset:", o.cv_midi_offset)
 o.settingsSave()
 
-print("* Test asyncronous functions")
-# CV at Major 9th interval
-o.cv_midi_offset=13
-asyncio.run(main())
-# CV at Major 7th interval
-o.cv_midi_offset=11
-asyncio.run(main())
-# CV at third interval
-o.cv_midi_offset=4
-asyncio.run(main())
-# CV at unison
+print("* Test  CV tracking functions")
+print("CV at unison")
 o.cv_midi_offset=0
-asyncio.run(main())
-# Turn off cv tracking
+simplePlay()
+print("CV at Major 9th interval")
+o.cv_midi_offset=13
+simplePlay()
+print("CV at Major 7th interval")
+o.cv_midi_offset=11
+simplePlay()
+print("CV at third interval")
+o.cv_midi_offset=4
+simplePlay()
+print("Turn off cv tracking")
 o.cv_midi_channel=2
+simplePlay()
+print("asyncro function")
 asyncio.run(main())
