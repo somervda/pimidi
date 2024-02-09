@@ -51,5 +51,5 @@ simplePlay()
 print("Turn off cv tracking")
 o.cv_midi_channel=2
 simplePlay()
-print("asyncro function")
+print("* Test asyncro function")
 asyncio.run(main())
