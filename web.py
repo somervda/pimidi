@@ -87,6 +87,16 @@ def midi_note_reset():
         o.noteOff(n)
     return{True}
 
+@app.get("/cvSetValue/{value}/{on}")
+def cv_set_value(value: Annotated[int, Path(title="DAC value",le=4095,ge=0)],
+    on: Annotated[int, Path(title="Trigger on of off (0,1)",ge=0,le=1)]):
+    # Turn on or off cv based on a DAC VALUE
+    if on==1:
+        o.cvSetValue(value,True)
+    else:
+        o.cvSetValue(value,True)
+    return{True}
+
 # services for getters and setters
 
 @app.get("/CVMaxVolts")

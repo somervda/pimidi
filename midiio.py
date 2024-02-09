@@ -252,7 +252,7 @@ class MidiIO:
         dacValue = self.dacOffset + ((note - self.cv_first_midi_note) * self.cvSemitoneStep)
         return (dacValue)
     
-    def dacValue(self,value,on=True):
+    def cvSetValue(self,value,on=True):
         # Used to play specific values from the cv 
         if value < 0 or value > 4095:
             raise ValueError("CV DAC value can only be between 0 and 4095")
