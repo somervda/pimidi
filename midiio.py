@@ -83,8 +83,8 @@ class MidiIO:
         msg = Message(noteOn, channel=channel)
         self.conn.write(msg)
         if (channel==self.cv_midi_channel):
-            # Play the note thru CV as well
-            self.cvNoteOn(note)
+            # Play the note thru CV as well (with the specified offset)
+            self.cvNoteOn(note + self.cv_midi_offset)
 
 
         if self.midi_display:
@@ -111,8 +111,8 @@ class MidiIO:
         msg = Message(noteOff, channel=channel)
         self.conn.write(msg)
         if (channel==self.cv_midi_channel):
-            # Play the note thru CV as well
-            self.cvNoteOff(note)
+            # Play the note thru CV as well (with the specified offset)
+            self.cvNoteOff(note + self.cv_midi_offset)
         if self.midi_display:
             # Clear the note being played
             self.oledClearNoteText()
@@ -246,9 +246,18 @@ class MidiIO:
         noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
         noteName = noteNames[midiNote - (int(midiNote / 12) * 12)]
         return noteName + str(octave)
-    
+        
     def dacMidiNoteValue(self,note):
         # Use the cv calabration info to return the cv value equal to the midi note
         dacValue = self.dacOffset + ((note - self.cv_first_midi_note) * self.cvSemitoneStep)
         return (dacValue)
-        
+    
+    def dacValue(self,value,on=True):
+        # Used to play specific values from the cv 
+        if value < 0 or value > 4095:
+            raise ValueError("CV DAC value can only be between 0 and 4095")
+        self.dac.raw_value= value
+        if on :
+            GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
+        else:
+            GPIO.output(self.cvTriggerChannel,GPIO.LOW)

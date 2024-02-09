@@ -11,16 +11,13 @@ o = MidiIO()
 async def main():
     print("start noteplay")
     task = asyncio.create_task(o.notePlay(44, 2))
-    print("end noteplay")
+    print("end noteplay - should see this before note finishes playing")
     await task
-    for x in range(40, 72, 1):
-        task = asyncio.create_task(o.notePlay(x, 0.1))
+    for x in range(50, 66, 3):
+        task = asyncio.create_task(o.notePlay(x, 0.2))
         await task
-        task = asyncio.create_task(o.notePlay(x , 0.1))
-        await task
-        await asyncio.sleep(.2)
+        # await asyncio.sleep(.02)
     print("finish main")
-
 
 print("* Basic getter, setter tests *")
 o.cv_max_volts = o.cv_max_volts
@@ -38,4 +35,18 @@ print("cv_midi_offset:", o.cv_midi_offset)
 o.settingsSave()
 
 print("* Test asyncronous functions")
+# CV at Major 9th interval
+o.cv_midi_offset=13
+asyncio.run(main())
+# CV at Major 7th interval
+o.cv_midi_offset=11
+asyncio.run(main())
+# CV at third interval
+o.cv_midi_offset=4
+asyncio.run(main())
+# CV at unison
+o.cv_midi_offset=0
+asyncio.run(main())
+# Turn off cv tracking
+o.cv_midi_channel=2
 asyncio.run(main())
