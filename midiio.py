@@ -3,7 +3,7 @@
 # Main wrapper for py_midi, ssd1306, mcp4725 and GPIO functionality
 # The wrapper also exposes the interface as a class and
 # orchistrates some of the IO activities that work together
-# i.e. play midi and cv togther if both using the same midi channel
+# i.e. play midi and cv together if both using the same midi channel
 
 import json
 import math
@@ -20,8 +20,8 @@ from midi import NoteOff
 from midi import Message
 
 # Wrap the I2C functions with try/except so the code will still
-# work if testing on a device that does not have I2C perferals
-# installed
+# run if testing on a device that does not have I2C peripherals
+# installed (pizero2w in coffee shop)
 try:
     import adafruit_mcp4725
 except:
@@ -38,9 +38,9 @@ class MidiIO:
     MIDINOTE127 = 12543.85
     # etFreqStep is the ratio in hertz between 2 adjacent notes in the equal temperament scale (12th root of 2)
     etFreqRatio = math.pow(2, 1 / 12)
-    # If playing the cv in unison with the midi, the  cv_midi_offset will offset the cv note
-    # number of semitones from the midi note (Play harmony)
-    # Runtime parameter not saved in settings. By default plays same note
+    # Runtime parameter to allow playing the cv note a set number of semitones
+    # above or below the midi note. By default plays same note
+    # Used to play some basic harmony
     _cv_midi_offset = 0
 
     cvTriggerChannel = 23
@@ -86,23 +86,9 @@ class MidiIO:
         if (channel==self.cv_midi_channel):
             # Play the note thru CV as well (with the specified offset)
             self.cvNoteOn(note + self.cv_midi_offset)
-
-
         if self.midi_display:
             # Show the note being played
             self.oledShowNoteText(note)
-
-    def cvNoteOn(self,note):
-        dacValue = self.dacMidiNoteValue(note+3)
-        if (dacValue >= 0 and dacValue <= 4095):
-            self.dac.raw_value= dacValue
-            GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
-
-    def cvNoteOff(self,note):
-        dacValue = self.dacMidiNoteValue(note)
-        if (dacValue >= 0 and dacValue <= 4095):
-            self.dac.raw_value= dacValue
-            GPIO.output(self.cvTriggerChannel,GPIO.LOW)
 
     def noteOff(self, note, channel=None, velocity=127):
         # print("Note off",note)
@@ -118,6 +104,18 @@ class MidiIO:
             # Clear the note being played
             self.oledClearNoteText()
 
+    def cvNoteOn(self,note):
+        dacValue = self.dacMidiNoteValue(note+3)
+        if (dacValue >= 0 and dacValue <= 4095):
+            self.dac.raw_value= dacValue
+            GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
+
+    def cvNoteOff(self,note):
+        dacValue = self.dacMidiNoteValue(note)
+        if (dacValue >= 0 and dacValue <= 4095):
+            self.dac.raw_value= dacValue
+            GPIO.output(self.cvTriggerChannel,GPIO.LOW)
+
     # Note: Use async wrapper for playNote this so noteOn and noteOff can happen in background
     # while pimidi is working on other requests.
     async def notePlay(self, note, duration, channel=None, velocity=127):
@@ -125,7 +123,7 @@ class MidiIO:
         await asyncio.sleep(duration)
         self.noteOff(note, channel=channel, velocity=velocity)
 
-    # getters
+    # *** getters ***
 
     @property
     def cv_max_volts(self):
@@ -151,7 +149,7 @@ class MidiIO:
     def midi_default_channel(self):
         return self.settings["midi"]["default_channel"]
 
-    # setters
+    # *** setters ***
     @cv_max_volts.setter
     def cv_max_volts(self, volts):
         if volts >= 6:
@@ -188,6 +186,7 @@ class MidiIO:
             raise ValueError("Midi only supports channels 1 to 16")
         self.settings["midi"]["default_channel"] = channel
 
+    #  *** Initialization functions ***
     # Initialize CV range settings
 
     def cvSettup(self):
@@ -218,7 +217,7 @@ class MidiIO:
     def getMidiNoteHertz(self, note):
         return self.MIDINOTE127 / (math.pow(self.etFreqRatio, 127 - note))
 
-    # Helper functions to simplify use of periferals
+    # *** Helper functions **** 
 
     def oledText(self, x, y, text, refresh=False, size=1):
         if refresh:
@@ -249,12 +248,12 @@ class MidiIO:
         return noteName + str(octave)
         
     def dacMidiNoteValue(self,note):
-        # Use the cv calabration info to return the cv value equal to the midi note
+        # Use the cv calibration info to return the cv value equal to the midi note
         dacValue = self.dacOffset + ((note - self.cv_first_midi_note) * self.cvSemitoneStep)
         return (dacValue)
     
     def cvSetValue(self,value,on=True):
-        # Used to play specific values from the cv 
+        # Used to send specific values from the cv (Mainly used to get cv note range info)
         if value < 0 or value > 4095:
             raise ValueError("CV DAC value can only be between 0 and 4095")
         self.dac.raw_value= value
