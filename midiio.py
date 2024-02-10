@@ -77,7 +77,7 @@ class MidiIO:
             settings_file.write(json_settings)
 
     def noteOn(self, note, channel=None, velocity=127):
-        # print("note On",note)
+        print("note On",note)
         if channel == None:
             channel = self.midi_default_channel
         noteOn = NoteOn(note, velocity)
@@ -105,7 +105,8 @@ class MidiIO:
             self.oledClearNoteText()
 
     def cvNoteOn(self,note):
-        dacValue = self.dacMidiNoteValue(note+3)
+        dacValue = self.dacMidiNoteValue(note)
+        print("note/dacValue:",note,dacValue)
         if (dacValue >= 0 and dacValue <= 4095):
             self.dac.raw_value= dacValue
             GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
@@ -204,6 +205,7 @@ class MidiIO:
             if self.cv_min_hertz > noteHertz:
                 break
         self.cv_first_midi_note = note + 1
+        print("self.cv_first_midi_note:",self.cv_first_midi_note)
         # Find the DAC value offset to that first note by
         # stepping up the dac values until we are one semitone higher or
         # get to the first midi note frequency
@@ -213,6 +215,7 @@ class MidiIO:
             ) >= self.getMidiNoteHertz(self.cv_first_midi_note):
                 self.dacOffset = dacOffset
                 break
+        print("self.dacOffset:",self.dacOffset)
 
     def getMidiNoteHertz(self, note):
         return self.MIDINOTE127 / (math.pow(self.etFreqRatio, 127 - note))
@@ -242,7 +245,7 @@ class MidiIO:
 
     def getMidiNoteName(self, midiNote):
         # Return the note name for a midi note in range of 0 to 127
-        octave = int(midiNote / 12) - 2
+        octave = int(midiNote / 12) - 1
         noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
         noteName = noteNames[midiNote - (int(midiNote / 12) * 12)]
         return noteName + str(octave)

@@ -4,6 +4,19 @@ import time
 import asyncio
 from midiio import MidiIO
 
+def play():
+    for x in range(48, 90, 4):
+        o.noteOn(x)
+        time.sleep(3)
+        o.noteOff(x)
+
+async def asycPlay():
+    print("start noteplay")
+    task = asyncio.create_task(o.notePlay(50, 3))
+    print("end noteplay - should see this before note finishes playing")
+    await task
+    print("finish main")
+
 o = MidiIO()
 
 print("* Basic getter, setter tests *")
@@ -26,12 +39,6 @@ print("* Test  CV tracking functions")
 print("CV at unison")
 o.cv_midi_offset=0
 play()
-print("CV at Major 9th interval")
-o.cv_midi_offset=13
-play()
-print("CV at Major 7th interval")
-o.cv_midi_offset=11
-play()
 print("CV at third interval")
 o.cv_midi_offset=4
 play()
@@ -43,15 +50,3 @@ play()
 print("* Test asyncro function")
 asyncio.run(asycPlay())
 
-def play():
-    for x in range(50, 66, 3):
-        o.noteOn(x)
-        time.sleep(1)
-        o.noteOff(x)
-
-async def asycPlay():
-    print("start noteplay")
-    task = asyncio.create_task(o.notePlay(50, 3))
-    print("end noteplay - should see this before note finishes playing")
-    await task
-    print("finish main")
