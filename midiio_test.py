@@ -44,8 +44,10 @@ o.cv_midi_offset=4
 play()
 print("Turn off cv tracking")
 o.cv_midi_channel=2
+o.cv_midi_offset=0
 play()
 
+o.cv_midi_channel=1
 # *** Test asynchronous note playing ***
 print("* Test asyncro function")
 asyncio.run(asycPlay())
