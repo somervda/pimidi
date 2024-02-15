@@ -160,6 +160,6 @@ def set_midi_default_channel(value: Annotated[int, Path(title="Default Midi chan
     o.settingsSave()
     return True
 
-# Note: Make sure this line is at thye end of the file so fastAPI falls through the other
+# Note: Make sure this line is at the end of the file so fastAPI falls through the other
 # routes before serving up static files 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

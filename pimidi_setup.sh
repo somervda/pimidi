@@ -69,6 +69,6 @@ pip install "uvicorn[standard]"
 echo 8. Setup the pimidi_uvicorn.service to run on startup 
 sudo cp pimidi_uvicorn.service /lib/systemd/system/pimidi_uvicorn.service
 sudo systemctl enable pimidi_uvicorn.service
-sudo systemctl start pimidi_uvicorn.service
+sudo systemctl start pimidi_uvicorn.service 
 
 date
