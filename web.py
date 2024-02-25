@@ -97,6 +97,11 @@ def cv_set_value(value: Annotated[int, Path(title="DAC value",le=4095,ge=0)],
         o.cvSetValue(value,True)
     return{True}
 
+@app.get("/settings")
+def get_settings():
+    # Special function to get all the settings at once
+    return(o.getSettings())
+
 # services for getters and setters
 
 @app.get("/CVMaxVolts")

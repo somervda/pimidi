@@ -117,6 +117,9 @@ class MidiIO:
             self.dac.raw_value= dacValue
             GPIO.output(self.cvTriggerChannel,GPIO.LOW)
 
+    def getSettings(self):
+        return self.settings
+
     # Note: Use async wrapper for playNote this so noteOn and noteOff can happen in background
     # while pimidi is working on other requests.
     async def notePlay(self, note, duration, channel=None, velocity=127):
@@ -126,7 +129,9 @@ class MidiIO:
 
     # *** getters ***
 
-    @property
+
+
+    @property    
     def cv_max_volts(self):
         return self.settings["cv"]["max_volts"]
 
