@@ -14,6 +14,7 @@ from midiio import MidiIO
 from typing import Union,Annotated
 from fastapi import FastAPI,Path
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # Get IP address
@@ -23,6 +24,14 @@ import os
 
 o = MidiIO()
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 try:
     # Show the IP address
@@ -100,7 +109,7 @@ def cv_set_value(value: Annotated[int, Path(title="DAC value",le=4095,ge=0)],
 @app.get("/settings")
 def get_settings():
     # Special function to get all the settings at once
-    return(o.getSettings())
+    return(o.settings)
 
 # services for getters and setters
 

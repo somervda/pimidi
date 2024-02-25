@@ -44,6 +44,7 @@ class MidiIO:
     _cv_midi_offset = 0
 
     cvTriggerChannel = 23
+    _settings = {}
 
     # Initialize I2C bus.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -58,7 +59,7 @@ class MidiIO:
         # Load pimidi.config (json file)
         try:
             with open("settings.json") as settings_file:
-                self.settings = json.load(settings_file)
+                self._settings = json.load(settings_file)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.strerror, e.filename))
         self.cvSettup()
@@ -73,7 +74,7 @@ class MidiIO:
 
     def settingsSave(self):
         with open("settings.json", "w") as settings_file:
-            json_settings = json.dumps(self.settings, indent=4)
+            json_settings = json.dumps(self._settings, indent=4)
             settings_file.write(json_settings)
 
     def noteOn(self, note, channel=None, velocity=127):
@@ -117,8 +118,6 @@ class MidiIO:
             self.dac.raw_value= dacValue
             GPIO.output(self.cvTriggerChannel,GPIO.LOW)
 
-    def getSettings(self):
-        return self.settings
 
     # Note: Use async wrapper for playNote this so noteOn and noteOff can happen in background
     # while pimidi is working on other requests.
@@ -132,16 +131,20 @@ class MidiIO:
 
 
     @property    
+    def settings(self):
+        return self._settings
+
+    @property    
     def cv_max_volts(self):
-        return self.settings["cv"]["max_volts"]
+        return self._settings["cv"]["max_volts"]
 
     @property
     def cv_midi_channel(self):
-        return self.settings["cv"]["midi_channel"]
+        return self._settings["cv"]["midi_channel"]
 
     @property
     def cv_min_hertz(self):
-        return self.settings["cv"]["min_hertz"]
+        return self._settings["cv"]["min_hertz"]
 
     @property
     def cv_midi_offset(self):
@@ -149,24 +152,24 @@ class MidiIO:
 
     @property
     def midi_display(self):
-        return self.settings["midi"]["display"]
+        return self._settings["midi"]["display"]
 
     @property
     def midi_default_channel(self):
-        return self.settings["midi"]["default_channel"]
+        return self._settings["midi"]["default_channel"]
 
     # *** setters ***
     @cv_max_volts.setter
     def cv_max_volts(self, volts):
         if volts >= 6:
             raise ValueError("Volts should never be more than 6 volts!")
-        self.settings["cv"]["max_volts"] = volts
+        self._settings["cv"]["max_volts"] = volts
 
     @cv_midi_channel.setter
     def cv_midi_channel(self, channel):
         if channel < 0 or channel > 15:
             raise ValueError("CV can only track midi channels 0 to 15")
-        self.settings["cv"]["midi_channel"] = channel
+        self._settings["cv"]["midi_channel"] = channel
 
     @cv_midi_offset.setter
     def cv_midi_offset(self, offset):
@@ -180,17 +183,17 @@ class MidiIO:
             raise ValueError(
                 "Midi only supports a frequency range of 8.16 to 13289.75 hertz"
             )
-        self.settings["cv"]["min_hertz"] = hertz
+        self._settings["cv"]["min_hertz"] = hertz
 
     @midi_display.setter
     def midi_display(self, display):
-        self.settings["midi"]["display"] = display
+        self._settings["midi"]["display"] = display
 
     @midi_default_channel.setter
     def midi_default_channel(self, channel):
         if channel < 1 or channel > 16:
             raise ValueError("Midi only supports channels 1 to 16")
-        self.settings["midi"]["default_channel"] = channel
+        self._settings["midi"]["default_channel"] = channel
 
     #  *** Initialization functions ***
     # Initialize CV range settings
