@@ -103,7 +103,7 @@ def cv_set_value(value: Annotated[int, Path(title="DAC value",le=4095,ge=0)],
     if on==1:
         o.cvSetValue(value,True)
     else:
-        o.cvSetValue(value,True)
+        o.cvSetValue(value,False)
     return{True}
 
 @app.get("/settings")
@@ -117,12 +117,22 @@ def get_settings():
 def get_cv_max_volts():
     return(o.cv_max_volts)
 
+
 @app.get("/CVMaxVolts/{value}")
 def set_cv_max_volts(value: Annotated[float, Path(title="CV volts on maximum setting",le=6,gt=0)]):
     o.cv_max_volts=value
     o.settingsSave()
     # Recalc CV tuning and range
     o.cvSettup()
+    return True
+
+@app.get("/cvMidiOffset")
+def get_cv_midi_offset():
+    return(o.cv_midi_offset)
+
+@app.get("/cvMidiOffset/{value}")
+def set_cv_midi_offset(value: Annotated[int, Path(title="CV Midi offset",le=24,ge=-24)]):
+    o.cv_midi_offset=value
     return True
     
 @app.get("/CVMidiChannel")

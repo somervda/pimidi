@@ -69,6 +69,15 @@ pip install "uvicorn[standard]"
 echo 8. Setup the pimidi_uvicorn.service to run on startup 
 sudo cp pimidi_uvicorn.service /lib/systemd/system/pimidi_uvicorn.service
 sudo systemctl enable pimidi_uvicorn.service
+
+# Install music21 library to be able to work with ABC music notation
+# https://github.com/cuthbertLab/music21
+pip install music21
+
+# Install mido to support mid file management and playing
+# See https://github.com/mido/mido
+pip install mido
+
 sudo systemctl start pimidi_uvicorn.service 
 
 date
