@@ -1,6 +1,8 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("lib")
 
-#!/usr/bin/python3
+
 # Using https://github.com/edthrn/py-midi as simple midi to serial port interface
 # Make sure serial0 is enanbled by using the raspi-config utility and going to
 # periferals ->serial (Dont turn on logon shell but do enable serial)
@@ -14,17 +16,14 @@ from midi import MidiConnector
 from midi import NoteOn
 from midi import NoteOff
 from midi import Message
-
-for s in range(24,0,-4):
-    for x in range(0,48,3):
-        conn = MidiConnector('/dev/serial0')
-        non = NoteOn(38+x+s, 127)
-        msg = Message(non, channel=1)
-        print("Note:", 50+x+s)
-        conn.write(msg)
-        time.sleep(.05)
-        noff = NoteOff(38+x+s, 127)
-        msg = Message(noff, channel=1)
-        conn.write(msg)
-        time.sleep(.05)
-
+for n in range(40,100):
+    conn = MidiConnector('/dev/serial0')
+    non = NoteOn(n, 127)
+    print(n)
+    msg = Message(non, channel=1)
+    conn.write(msg)
+    time.sleep(.1)
+    noff = NoteOff(n, 127)
+    msg = Message(noff, channel=1)
+    conn.write(msg)
+    time.sleep(.1)

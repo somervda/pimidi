@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("lib")
+
 try:
     import RPi.GPIO as GPIO
 except RuntimeError:
@@ -11,27 +14,12 @@ GPIO.setmode(GPIO.BCM)
 
 # Test voltage swing and channel usage usage
 channel=23 
-GPIO.setup(channel,GPIO.OUT)
-for x in range(3):
-    print("Low")
-    GPIO.output(channel,GPIO.LOW)
-    time.sleep(.2)
-    print("High")
-    GPIO.output(channel,GPIO.HIGH)
-    time.sleep(.2)
-print("Low")
-GPIO.output(channel,GPIO.LOW)
-
-channel=24 
-GPIO.setup(channel,GPIO.OUT)
-for x in range(3):
-    print("Low")
-    GPIO.output(channel,GPIO.LOW)
-    time.sleep(.2)
-    print("High")
-    GPIO.output(channel,GPIO.HIGH)
-    time.sleep(.2)
-print("Low")
-GPIO.output(channel,GPIO.LOW)
+GPIO.setup(channel,GPIO.IN)
+for x in range(100):
+    if GPIO.input(channel) == 1 :
+        print("High")
+    else:
+        print("Low")
+    time.sleep(.5)
 
 

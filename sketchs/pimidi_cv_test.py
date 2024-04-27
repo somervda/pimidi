@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("lib")
 
 
 # SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries

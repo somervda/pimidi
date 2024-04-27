@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("lib")
+
+
 try:
     import RPi.GPIO as GPIO
 except RuntimeError:
@@ -7,12 +11,12 @@ import time
 # Turn off warnings about gpio possibly being is use.
 GPIO.setwarnings(False)
 # Using GPIO.BCM mode so channel number is the number after the GPIO desgnation.
-# So GPIO21 is 21 (Which is pin 40 or 40 if ysing GPIO.BOARD mode)
-channel=21 
 GPIO.setmode(GPIO.BCM)
 
+# Test voltage swing and channel usage usage
+channel=23 
 GPIO.setup(channel,GPIO.OUT)
-for x in range(10):
+for x in range(3):
     print("Low")
     GPIO.output(channel,GPIO.LOW)
     time.sleep(.2)
@@ -21,3 +25,17 @@ for x in range(10):
     time.sleep(.2)
 print("Low")
 GPIO.output(channel,GPIO.LOW)
+
+channel=24 
+GPIO.setup(channel,GPIO.OUT)
+for x in range(3):
+    print("Low")
+    GPIO.output(channel,GPIO.LOW)
+    time.sleep(.2)
+    print("High")
+    GPIO.output(channel,GPIO.HIGH)
+    time.sleep(.2)
+print("Low")
+GPIO.output(channel,GPIO.LOW)
+
+

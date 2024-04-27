@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import sys
+sys.path.append("lib")
 
 # The main entrypoint for the pimidi application
 # Runs in a fastAPI server to accept web service calls
