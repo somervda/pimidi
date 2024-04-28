@@ -36,7 +36,7 @@ echo 3. Installing OPi.GPIO
 # Install GPIO support for the orange PI 
 # see https://pypi.org/project/RPi.GPIO/ and https://sourceforge.net/p/raspberry-gpio-python/wiki/Home/ 
 # Note: Use GPIO.setmode(GPIO.SUNXI) to use "PA01" style channel naming
-pip install RPi.GPIO
+pip install RPi.GPIO --break-system-packages
 # Enable i2c hardware
 sudo raspi-config nonint do_i2c 0
 # Enable serial hardware but not console thru serial
@@ -53,19 +53,19 @@ sudo apt-get install -y i2c-tools
 # Give pi user access to i2c
 sudo usermod -a -G spi,gpio,i2c pi
 echo 4b. OLED Installing adafruit i2c and oled support
-pip3 install adafruit-circuitpython-ssd1306
+pip3 install adafruit-circuitpython-ssd1306 --break-system-packages
 
 echo 5. Install adafruit mcp4725 DAC support
 # See https://github.com/adafruit/Adafruit_CircuitPython_MCP4725 
-pip3 install adafruit-circuitpython-mcp4725
+pip3 install adafruit-circuitpython-mcp4725  --break-system-packages
 
 echo 6. Installing midi library for python
 # Using https://github.com/edthrn/py-midi 
-pip install py-midi 
+pip install py-midi  --break-system-packages
 
 echo 7. Install fastapi for web services and a ASGI web server
-pip install fastapi
-pip install "uvicorn[standard]"
+pip install fastapi  --break-system-packages
+pip install "uvicorn[standard]"  --break-system-packages
 # Note: I run uvicorn using this command during development
 # uvicorn web:app --reload --host pimidi.home
 
@@ -77,11 +77,11 @@ sudo systemctl enable pimidi_uvicorn.service
 
 # Install music21 library to be able to work with ABC music notation
 # https://github.com/cuthbertLab/music21
-pip install music21
+pip install music21  --break-system-packages
 
 # Install mido to support mid file management and playing
 # See https://github.com/mido/mido
-pip install mido
+pip install mido  --break-system-packages
 
 sudo systemctl start pimidi_uvicorn.service 
 
