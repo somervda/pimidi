@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-import sys
-sys.path.append("lib")
+
 
 # Basic example of clearing and drawing pixels on a SSD1306 OLED display.
 # This example and library is meant to work with Adafruit CircuitPython API.

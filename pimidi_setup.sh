@@ -22,6 +22,11 @@ echo 2. Installing and rationalizing Python Version Names
 sudo apt install -y python-is-python3
 sudo apt install -y python3-pip
 sudo apt install -y python-dev-is-python3
+# Add another path to the python libary folder
+# Note: I added an environemnt setting to do the same for 
+# the service
+echo 'export PYTHONPATH="${PYTHONPATH}:/home/pi/pimidi/lib"' >> ~/.bashrc 
+
 
 python --version
 pip --version

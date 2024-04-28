@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-import sys
-sys.path.append("lib")
+
 
 #!/usr/bin/python3
 # Using https://github.com/edthrn/py-midi as simple midi to serial port interface
