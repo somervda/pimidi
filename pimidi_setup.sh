@@ -31,6 +31,8 @@ echo 'export PYTHONPATH="${PYTHONPATH}:/home/pi/pimidi/lib"' >> ~/.bashrc
 python --version
 pip --version
 
+export PATH=$PATH:/home/pi/.local/bin
+
 
 echo 3. Installing OPi.GPIO 
 # Install GPIO support for the orange PI 
