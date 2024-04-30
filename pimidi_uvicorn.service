@@ -7,10 +7,10 @@ Wants=network-online.target
 Type=simple
 User=pi
 Group=pi  
-Environment=PYTHONPATH=/home/pi/pimidi/lib
+Environment=PYTHONPATH="/home/pi/pimidi/lib"
 WorkingDirectory=/home/pi/pimidi
 ExecStart=/home/pi/.local/bin/uvicorn \
-        --host pimidi.home web:app
+        --host pimidi.local web:app
 
 [Install]
 WantedBy=multi-user.target
