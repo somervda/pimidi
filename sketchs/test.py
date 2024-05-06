@@ -2,8 +2,8 @@
 import sys
 
 
-from abc import ABC
+from abcHelper import AbcHelper
 
-o = ABC("|: A | dAF DFA | ded cBA | dcd efg | fdf ecA | dAF DFA | ded cBA | dcd efg fdd d2 :|")
+o = AbcHelper("|: A | dAF DFA | ded cBA | dcd efg | fdf ecA | dAF DFA | ded cBA | dcd efg fdd d2 :|")
 for seq in o.sequence:
     print(seq["ppqn"],seq["actions"])
