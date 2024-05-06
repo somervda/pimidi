@@ -19,7 +19,8 @@ class AbcHelper:
         self._quiet = quiet
         not self._quiet and print("__init__")
         self._abc=abc
-        self.toSequence()
+        # self.toSequence()
+        self.addSequence(24)
 
 
     def toSequence(self):
