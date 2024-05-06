@@ -2,33 +2,44 @@
 
 # load an abc notation  and convert it to 
 # my PPQN data
-# PPQN is a dictionary  {"<ppqnseq>":[{"note":123,"action":"on"},{"note":120,"action":"off"}]}
-# with one entry per ppqn sequence number, the entry is an array of actions
-# action ={"note":<midi note value>,"action":"on|off"}
+# sequence is an array of arrays  
+# with one entry per PPQN value, the entry is an array of actions for that PPQN value eg:
+# [
+#  {'ppqn': 60, 'actions': [{'note': 62, 'action': 'on'}, {'note': 65, 'action': 'off'}]},
+#  {'ppqn': 120, 'actions': [{'note': 62, 'action': 'on'}, {'note': 65, 'action': 'off'}]}, 
+#  {'ppqn': 240, 'actions': [{'note': 62, 'action': 'on'}, {'note': 65, 'action': 'off'}]}
+# ]
 
 class ABC:
     _abc = ""
-    _PPQN = {}
+    _sequence = []
     _quiet = True
+
     def __init__(self,abc,quiet=True):
         self._quiet = quiet
         not self._quiet and print("__init__")
         self._abc=abc
-        self.buildPPQN()
+        self.addSequence(60)
+        self.addSequence(120)
+        self.addSequence(240)
 
-    def buildPPQN(self):
+    def addSequence(self,ppqn):
         actions=[]
         actions.append({"note":62,"action":"on"})
-        self._PPQN["96"] = actions
+        actions.append({"note":65,"action":"off"})
+        self._sequence.append({"ppqn":ppqn,"actions":actions})
 
 
 
 
     # getters
 
-    def getPPQN(self):
-        not self._quiet and print("getPPQN")
-        return self._PPQN
-    PPQN = property(getPPQN)
+    def getSequence(self):
+        not self._quiet and print("getSequence")
+        return self._sequence
+    sequence = property(getSequence)
 
-    
+o = ABC("|: A | dAF DFA | ded cBA | dcd efg | fdf ecA | dAF DFA | ded cBA | dcd efg fdd d2 :|")
+for seq in o.sequence:
+    print(seq["ppqn"],seq["actions"])
+print(o.sequence)
