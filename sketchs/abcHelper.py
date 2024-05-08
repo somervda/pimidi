@@ -15,10 +15,21 @@ class AbcHelper:
     _sequence = []
     _quiet = True
 
-    def __init__(self,abc,quiet=True):
+    _hasStarted = False
+    _semiToneAdjust=0
+    _midi=0
+    _noteDuration = 1
+    # _pendingAction is a noteOff at next ppqn time
+    _PendingAction={}
+
+    _ppqn=24
+    _ppqnNumber=0
+
+    def __init__(self,abc,ppqn,quiet=True):
         self._quiet = quiet
         not self._quiet and print("__init__")
         self._abc=abc
+        self._ppqn=ppqn
         # self.toSequence()
         self.addSequence(24)
 
@@ -26,71 +37,88 @@ class AbcHelper:
     def toSequence(self):
         # Convert the abc notation to a sequence
         # Read each character until start is found
-        hasStarted = False
-        semiToneAdjust=0
-        midi=0
-        noteDuration = 4
+        
+
         for abcChar in self._abc:
             # Skip over bar and blank space
             if abcChar not in ["|"," "] :
                 match abcChar:
                     case "^":
                         # sharp
-                        semiToneAdjust-=1
+                        self._semiToneAdjust-=1
                     case "_":
                         # flat
-                        semiToneAdjust-=1
+                        self._semiToneAdjust-=1
                     case "=":
                         # natural (Not supported yet)
-                        semiToneAdjust=0
+                        self._semiToneAdjust=0
                     case "C":
-                        midi=60
-                        hasStarted = True
+                        self._midi=60
+                        self._hasStarted = True
                     case "D":
-                        midi=62
-                        hasStarted = True
+                        self._midi=62
+                        self._hasStarted = True
                     case "E":
-                        midi=64
-                        hasStarted = True
+                        self._midi=64
+                        self._hasStarted = True
                     case "F":
-                        midi=65
-                        hasStarted = True
+                        self._midi=65
+                        self._hasStarted = True
                     case "G":
-                        midi=67
-                        hasStarted = True
+                        self._midi=67
+                        self._hasStarted = True
                     case "A":
-                        midi=69
-                        hasStarted = True
+                        self._midi=69
+                        self._hasStarted = True
                     case "B":
-                        midi=71
-                        hasStarted = True
+                        self._midi=71
+                        self._hasStarted = True
                     case "c":
-                        midi=72
-                        hasStarted = True
+                        self._midi=72
+                        self._hasStarted = True
                     case "d":
-                        midi=74
-                        hasStarted = True
+                        self._midi=74
+                        self._hasStarted = True
                     case "e":
-                        midi=76
-                        hasStarted = True
+                        self._midi=76
+                        self._hasStarted = True
                     case "f":
-                        midi=77
-                        hasStarted = True
+                        self._midi=77
+                        self._hasStarted = True
                     case "g":
-                        midi=79
-                        hasStarted = True
+                        self._midi=79
+                        self._hasStarted = True
                     case "a":
-                        midi=81
-                        hasStarted = True
+                        self._midi=81
+                        self._hasStarted = True
                     case "b":
-                        midi=83
-                        hasStarted = True
+                        self._midi=83
+                        self._hasStarted = True
                     case "\'":
-                        midi += 12
+                        self._midi += 12
                     case ",":
-                        midi -= 12
+                        self._midi -= 12
                     case "/":
-                        midi -= 12
+                        self._noteDuration /= 2
+
+
+    def checkForNoteWrite(self):
+        # performed when we see a new note being defined in the abc notation
+        if self._hasStarted:
+            # Newnote info so write out last one
+            midi += self._semiToneAdjust
+            if self._PendingAction == []:
+                # No pending action to write so just write out midi note
+                self.addSequence([{"note":self._midi,"action":"on"}])
+            else:    
+                self.addSequence([ self._pendingAction,{"note":self._midi,"action":"on"}])
+            self._ppqnNumber+= self._ppqn * self._noteDuration
+            # Resetup for next note
+            self._hasStarted=False
+            self._midi=0
+            self._semiToneAdjust=0
+            self._PendingAction=[]
+            self._noteDuration=1
 
 
 
@@ -98,13 +126,9 @@ class AbcHelper:
 
 
 
+    def addSequence(self,actions):
+        self._sequence.append({"ppqn":self._ppqn,"actions":actions})
 
-
-    def addSequence(self,ppqn):
-        actions=[]
-        actions.append({"note":62,"action":"on"})
-        actions.append({"note":65,"action":"off"})
-        self._sequence.append({"ppqn":ppqn,"actions":actions})
 
 
 
