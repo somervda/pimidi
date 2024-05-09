@@ -45,53 +45,70 @@ class AbcHelper:
                 match abcChar:
                     case "^":
                         # sharp
+                        self.checkForNoteWrite()
                         self._semiToneAdjust-=1
                     case "_":
                         # flat
+                        self.checkForNoteWrite()
                         self._semiToneAdjust-=1
                     case "=":
-                        # natural (Not supported yet)
+                        # natural (Keys other than C not supported)
+                        self.checkForNoteWrite()
                         self._semiToneAdjust=0
                     case "C":
+                        self.checkForNoteWrite()
                         self._midi=60
                         self._hasStarted = True
                     case "D":
+                        self.checkForNoteWrite()
                         self._midi=62
                         self._hasStarted = True
                     case "E":
+                        self.checkForNoteWrite()
                         self._midi=64
                         self._hasStarted = True
                     case "F":
+                        self.checkForNoteWrite()
                         self._midi=65
                         self._hasStarted = True
                     case "G":
+                        self.checkForNoteWrite()
                         self._midi=67
                         self._hasStarted = True
                     case "A":
+                        self.checkForNoteWrite()
                         self._midi=69
                         self._hasStarted = True
                     case "B":
+                        self.checkForNoteWrite()
                         self._midi=71
                         self._hasStarted = True
                     case "c":
+                        self.checkForNoteWrite()
                         self._midi=72
                         self._hasStarted = True
                     case "d":
+                        self.checkForNoteWrite()
                         self._midi=74
                         self._hasStarted = True
                     case "e":
+                        self.checkForNoteWrite()
                         self._midi=76
                         self._hasStarted = True
                     case "f":
+                        self.checkForNoteWrite()
                         self._midi=77
                         self._hasStarted = True
                     case "g":
+                        self.checkForNoteWrite()
                         self._midi=79
                         self._hasStarted = True
                     case "a":
+                        self.checkForNoteWrite()
                         self._midi=81
                         self._hasStarted = True
                     case "b":
+                        self.checkForNoteWrite()
                         self._midi=83
                         self._hasStarted = True
                     case "\'":
