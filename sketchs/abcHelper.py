@@ -19,8 +19,9 @@ class AbcHelper:
     _semiToneAdjust=0
     _midi=0
     _noteDuration = 1
+    _noteDurationOperator = ""
     # _pendingAction is a noteOff at next ppqn time
-    _PendingAction={}
+    _pendingAction={}
 
     _ppqn=24
     _ppqnNumber=0
@@ -30,8 +31,8 @@ class AbcHelper:
         not self._quiet and print("__init__")
         self._abc=abc
         self._ppqn=ppqn
-        # self.toSequence()
-        self.addSequence(24)
+        self.toSequence()
+
 
 
     def toSequence(self):
@@ -55,6 +56,11 @@ class AbcHelper:
                         # natural (Keys other than C not supported)
                         self.checkForNoteWrite()
                         self._semiToneAdjust=0
+                    case "z":
+                        # rest
+                        self.checkForNoteWrite()
+                        self._midi=0
+                        self._hasStarted = True
                     case "C":
                         self.checkForNoteWrite()
                         self._midi=60
@@ -115,27 +121,60 @@ class AbcHelper:
                         self._midi += 12
                     case ",":
                         self._midi -= 12
+                    case ">":
+                        self._noteDuration *= 1.5
                     case "/":
-                        self._noteDuration /= 2
-
+                        self._noteDurationOperator="/"
+                    case "2" :
+                        if self._noteDurationOperator=="/":
+                            self._noteDurationOperator=""
+                            self._noteDuration /= 2
+                        else:
+                            self._noteDuration = 2
+                    case "4" :
+                        if self._noteDurationOperator=="/":
+                            self._noteDurationOperator=""
+                            self._noteDuration /= 4
+                        else:
+                            self._noteDuration = 4
+                    case "8" :
+                        if self._noteDurationOperator=="/":
+                            self._noteDurationOperator=""
+                            self._noteDuration /= 8
+                        else:
+                            self._noteDuration = 8
+        if self._pendingAction != {}:
+            self.addSequence([ self._pendingAction])
 
     def checkForNoteWrite(self):
         # performed when we see a new note being defined in the abc notation
         if self._hasStarted:
             # Newnote info so write out last one
-            midi += self._semiToneAdjust
-            if self._PendingAction == []:
+            self._midi += self._semiToneAdjust
+            if self._pendingAction == {}:
                 # No pending action to write so just write out midi note
-                self.addSequence([{"note":self._midi,"action":"on"}])
-            else:    
-                self.addSequence([ self._pendingAction,{"note":self._midi,"action":"on"}])
-            self._ppqnNumber+= self._ppqn * self._noteDuration
-            # Resetup for next note
+                if self._midi !=0:
+                    self.addSequence([{"note":self._midi,"action":"on"}])
+            else:   
+                if self._midi !=0: 
+                    self.addSequence([ self._pendingAction,{"note":self._midi,"action":"on"}])
+                else:
+                    self.addSequence([ self._pendingAction])
+            # set ppqnNumber to next score location based on note duration and ppqn value being used 
+            if self._noteDurationOperator=="/":
+                self._noteDuration /= 2
+            self._ppqnNumber+= self._noteDuration * self._ppqn
+            if self._midi != 0:
+                self._pendingAction={"note":self._midi,"action":"off"}
+            else:
+                self._pendingAction={}
+
+            # Reset for next note
             self._hasStarted=False
             self._midi=0
             self._semiToneAdjust=0
-            self._PendingAction=[]
             self._noteDuration=1
+            self._noteDurationOperator=""
 
 
 
@@ -144,7 +183,7 @@ class AbcHelper:
 
 
     def addSequence(self,actions):
-        self._sequence.append({"ppqn":self._ppqn,"actions":actions})
+        self._sequence.append({"ppqn":self._ppqnNumber,"actions":actions})
 
 
 
