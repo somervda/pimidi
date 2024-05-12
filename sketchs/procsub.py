@@ -7,19 +7,20 @@ import time
 import json
 from threading import Timer
 from abcHelper import AbcHelper
-import os
-import sys
+from midiio import MidiIO
 
 import argparse
 
 
 
 
-_bps=280
+_bps=60
 # Pulses per quarter note
 _ppqn=32
 _abc=""
 _ppqnSequenceIndex=0
+
+midoio = MidiIO()
 
 def doPPQN():
     # do actions to be performed on the current ppqn value
@@ -28,8 +29,18 @@ def doPPQN():
     global _bps
     global tPPQN
     global _ppqn
-    tPPQN.interval=60/(_bps * _ppqn)
-    print(time.time(),_bps,tPPQN.interval)
+    global _ppqnSequenceIndex
+    print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time())
+    for action in abchelper.sequence[_ppqnSequenceIndex]['actions']:
+        match action.action:
+            case "on":
+                midoio.noteOn(action.note)
+            case "off":
+                midoio.noteOff(action.note)
+    _ppqnSequenceIndex+=1
+    # Calculate the difference between ppqn values
+    ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
+    tPPQN.interval=(60 * ppqnDelta)/(_bps * _ppqn)
 
 def getComm():
     global _bps
@@ -39,7 +50,6 @@ def getComm():
         with open("data.json","r") as comm_file:
             comm = json.load(comm_file)
             _bps= comm["bps"]
-            print("beat",_bps)
     except:
         pass
 
@@ -75,17 +85,18 @@ if __name__ == '__main__':
     with args.abcFile as abcfile:
         _abc=abcfile.read()
     abchelper=AbcHelper(_abc,_ppqn)
-    print(_abchelper.sequence)
+    # print(abchelper.sequence)
     #Really we are making a thread and controlling it
     # tPPQN is invoked every ppqn action in the abchelper.sequence
     # do the first ppqn action at the first ppqn value in the sequence (Then adjust as we go on)
-    firstPPQNInterval = abchelper.sequence[0]['ppqn'] * (60/(_bps*_ppqn))
+    firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bps*_ppqn))
+    print(firstPPQNInterval)
     tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
     # tComm runns periodically to get any new communication and apply it
     tComm = RepeatTimer(1,getComm)
     print('threading started')
-    # tBeat.start() 
-    # tComm.start()
+    tPPQN.start() 
+    tComm.start()
 
     while True:
         time.sleep(1)
