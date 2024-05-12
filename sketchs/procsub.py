@@ -7,11 +7,18 @@ import time
 import json
 from threading import Timer
 from abcHelper import AbcHelper
+import os
+import sys
+
+import argparse
+
+
+
 
 _bps=280
 # Pulses per quarter note
 _ppqn=32
-
+_abc=""
 
 def doBeat():
     global _bps
@@ -53,19 +60,31 @@ class RepeatTimer(Timer):
             self.function(*self.args,**self.kwargs)
         print('Done')
 
-#Really we are making a thread and controlling it
-# tBeat is invoked every beet to do what is needed on that beat
-tBeat = RepeatTimer(.5,doBeat)
-# tComm runns periodically to get any new communication and apply it
-tComm = RepeatTimer(1,getComm)
-print('threading started')
-tBeat.start() 
-tComm.start()
 
-while True:
-    time.sleep(1)
-    
-print('threading finishing')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Play a sequence of abc notation notes')
+    parser.add_argument('--file', dest='abcFile', help='abc notation file containing sequence to played',required=True,type=argparse.FileType('r'))
+    parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
+    args = parser.parse_args()
+    _ppqn=args.ppqn
+    with args.abcFile as abcfile:
+        _abc=abcfile.read()
+    abchelper=AbcHelper(_abc,_ppqn)
+    print(abchelper.sequence)
+    #Really we are making a thread and controlling it
+    # tBeat is invoked every beet to do what is needed on that beat
+    tBeat = RepeatTimer(.5,doBeat)
+    # tComm runns periodically to get any new communication and apply it
+    tComm = RepeatTimer(1,getComm)
+    print('threading started')
+    # tBeat.start() 
+    # tComm.start()
 
-tBeat.cancel()
-tComm.cancel()
+    while True:
+        time.sleep(1)
+        
+    print('threading finishing')
+
+    tBeat.cancel()
+    tComm.cancel()
