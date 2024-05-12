@@ -16,6 +16,7 @@ class AbcHelper:
     _quiet = True
 
     _hasStarted = False
+    _quotedText = False
     _semiToneAdjust=0
     _midi=0
     _noteDuration = 1
@@ -42,107 +43,111 @@ class AbcHelper:
 
         for abcChar in self._abc:
             # Skip over bar and blank space
-            if abcChar not in ["|"," "] :
-                match abcChar:
-                    case "^":
-                        # sharp
-                        self.checkForNoteWrite()
-                        self._semiToneAdjust-=1
-                    case "_":
-                        # flat
-                        self.checkForNoteWrite()
-                        self._semiToneAdjust-=1
-                    case "=":
-                        # natural (Keys other than C not supported)
-                        self.checkForNoteWrite()
-                        self._semiToneAdjust=0
-                    case "z":
-                        # rest
-                        self.checkForNoteWrite()
-                        self._midi=0
-                        self._hasStarted = True
-                    case "C":
-                        self.checkForNoteWrite()
-                        self._midi=60
-                        self._hasStarted = True
-                    case "D":
-                        self.checkForNoteWrite()
-                        self._midi=62
-                        self._hasStarted = True
-                    case "E":
-                        self.checkForNoteWrite()
-                        self._midi=64
-                        self._hasStarted = True
-                    case "F":
-                        self.checkForNoteWrite()
-                        self._midi=65
-                        self._hasStarted = True
-                    case "G":
-                        self.checkForNoteWrite()
-                        self._midi=67
-                        self._hasStarted = True
-                    case "A":
-                        self.checkForNoteWrite()
-                        self._midi=69
-                        self._hasStarted = True
-                    case "B":
-                        self.checkForNoteWrite()
-                        self._midi=71
-                        self._hasStarted = True
-                    case "c":
-                        self.checkForNoteWrite()
-                        self._midi=72
-                        self._hasStarted = True
-                    case "d":
-                        self.checkForNoteWrite()
-                        self._midi=74
-                        self._hasStarted = True
-                    case "e":
-                        self.checkForNoteWrite()
-                        self._midi=76
-                        self._hasStarted = True
-                    case "f":
-                        self.checkForNoteWrite()
-                        self._midi=77
-                        self._hasStarted = True
-                    case "g":
-                        self.checkForNoteWrite()
-                        self._midi=79
-                        self._hasStarted = True
-                    case "a":
-                        self.checkForNoteWrite()
-                        self._midi=81
-                        self._hasStarted = True
-                    case "b":
-                        self.checkForNoteWrite()
-                        self._midi=83
-                        self._hasStarted = True
-                    case "\'":
-                        self._midi += 12
-                    case ",":
-                        self._midi -= 12
-                    case ">":
-                        self._noteDuration *= 1.5
-                    case "/":
-                        self._noteDurationOperator="/"
-                    case "2" :
-                        if self._noteDurationOperator=="/":
-                            self._noteDurationOperator=""
-                            self._noteDuration /= 2
-                        else:
-                            self._noteDuration = 2
-                    case "4" :
-                        if self._noteDurationOperator=="/":
-                            self._noteDurationOperator=""
-                            self._noteDuration /= 4
-                        else:
-                            self._noteDuration = 4
-                    case "8" :
-                        if self._noteDurationOperator=="/":
-                            self._noteDurationOperator=""
-                            self._noteDuration /= 8
-                        else:
-                            self._noteDuration = 8
+            if abcChar not in ["|"," ",":"] :
+                if  abcChar =="\"":
+                    # skip quoted text (Chord symbols not support)
+                    self._quotedText = not self._quotedText
+                if not self._quotedText:
+                    match abcChar:
+                        case "^":
+                            # sharp
+                            self.checkForNoteWrite()
+                            self._semiToneAdjust-=1
+                        case "_":
+                            # flat
+                            self.checkForNoteWrite()
+                            self._semiToneAdjust-=1
+                        case "=":
+                            # natural (Keys other than C not supported)
+                            self.checkForNoteWrite()
+                            self._semiToneAdjust=0
+                        case "z":
+                            # rest
+                            self.checkForNoteWrite()
+                            self._midi=0
+                            self._hasStarted = True
+                        case "C":
+                            self.checkForNoteWrite()
+                            self._midi=60
+                            self._hasStarted = True
+                        case "D":
+                            self.checkForNoteWrite()
+                            self._midi=62
+                            self._hasStarted = True
+                        case "E":
+                            self.checkForNoteWrite()
+                            self._midi=64
+                            self._hasStarted = True
+                        case "F":
+                            self.checkForNoteWrite()
+                            self._midi=65
+                            self._hasStarted = True
+                        case "G":
+                            self.checkForNoteWrite()
+                            self._midi=67
+                            self._hasStarted = True
+                        case "A":
+                            self.checkForNoteWrite()
+                            self._midi=69
+                            self._hasStarted = True
+                        case "B":
+                            self.checkForNoteWrite()
+                            self._midi=71
+                            self._hasStarted = True
+                        case "c":
+                            self.checkForNoteWrite()
+                            self._midi=72
+                            self._hasStarted = True
+                        case "d":
+                            self.checkForNoteWrite()
+                            self._midi=74
+                            self._hasStarted = True
+                        case "e":
+                            self.checkForNoteWrite()
+                            self._midi=76
+                            self._hasStarted = True
+                        case "f":
+                            self.checkForNoteWrite()
+                            self._midi=77
+                            self._hasStarted = True
+                        case "g":
+                            self.checkForNoteWrite()
+                            self._midi=79
+                            self._hasStarted = True
+                        case "a":
+                            self.checkForNoteWrite()
+                            self._midi=81
+                            self._hasStarted = True
+                        case "b":
+                            self.checkForNoteWrite()
+                            self._midi=83
+                            self._hasStarted = True
+                        case "\'":
+                            self._midi += 12
+                        case ",":
+                            self._midi -= 12
+                        case ">":
+                            self._noteDuration *= 1.5
+                        case "/":
+                            self._noteDurationOperator="/"
+                        case "2" :
+                            if self._noteDurationOperator=="/":
+                                self._noteDurationOperator=""
+                                self._noteDuration /= 2
+                            else:
+                                self._noteDuration = 2
+                        case "4" :
+                            if self._noteDurationOperator=="/":
+                                self._noteDurationOperator=""
+                                self._noteDuration /= 4
+                            else:
+                                self._noteDuration = 4
+                        case "8" :
+                            if self._noteDurationOperator=="/":
+                                self._noteDurationOperator=""
+                                self._noteDuration /= 8
+                            else:
+                                self._noteDuration = 8
         if self._pendingAction != {}:
             self.addSequence([ self._pendingAction])
 
