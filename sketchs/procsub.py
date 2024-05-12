@@ -19,13 +19,17 @@ _bps=280
 # Pulses per quarter note
 _ppqn=32
 _abc=""
+_ppqnSequenceIndex=0
 
-def doBeat():
+def doPPQN():
+    # do actions to be performed on the current ppqn value
+    # then read the next ppqn value and set the timer interval to the
+    # interval until the next ppqn value
     global _bps
-    global tBeat
+    global tPPQN
     global _ppqn
-    tBeat.interval=60/(_bps * _ppqn)
-    print(time.time(),_bps,tBeat.interval)
+    tPPQN.interval=60/(_bps * _ppqn)
+    print(time.time(),_bps,tPPQN.interval)
 
 def getComm():
     global _bps
@@ -71,10 +75,12 @@ if __name__ == '__main__':
     with args.abcFile as abcfile:
         _abc=abcfile.read()
     abchelper=AbcHelper(_abc,_ppqn)
-    print(abchelper.sequence)
+    print(_abchelper.sequence)
     #Really we are making a thread and controlling it
-    # tBeat is invoked every beet to do what is needed on that beat
-    tBeat = RepeatTimer(.5,doBeat)
+    # tPPQN is invoked every ppqn action in the abchelper.sequence
+    # do the first ppqn action at the first ppqn value in the sequence (Then adjust as we go on)
+    firstPPQNInterval = abchelper.sequence[0]['ppqn'] * (60/(_bps*_ppqn))
+    tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
     # tComm runns periodically to get any new communication and apply it
     tComm = RepeatTimer(1,getComm)
     print('threading started')
@@ -86,5 +92,5 @@ if __name__ == '__main__':
         
     print('threading finishing')
 
-    tBeat.cancel()
+    tPPQN.cancel()
     tComm.cancel()
