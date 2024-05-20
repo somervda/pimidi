@@ -1,1 +1,4 @@
-{"bps": 30}
+{
+    "bps": 600,
+    "repeat": false
+}

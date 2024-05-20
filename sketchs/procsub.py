@@ -14,7 +14,9 @@ import argparse
 
 
 
-_bps=60
+_bps=80
+_repeat = False
+_cycle= 0
 # Pulses per quarter note
 _ppqn=32
 _abc=""
@@ -27,29 +29,43 @@ def doPPQN():
     # then read the next ppqn value and set the timer interval to the
     # interval until the next ppqn value
     global _bps
+
     global tPPQN
+    global tComm
     global _ppqn
     global _ppqnSequenceIndex
-    print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time())
+    print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bps,len(abchelper.sequence))
     for action in abchelper.sequence[_ppqnSequenceIndex]['actions']:
-        match action.action:
+        match action["action"]:
             case "on":
-                midoio.noteOn(action.note)
+                midoio.noteOn(action["note"])
             case "off":
-                midoio.noteOff(action.note)
+                midoio.noteOff(action["note"])
     _ppqnSequenceIndex+=1
     # Calculate the difference between ppqn values
-    ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
-    tPPQN.interval=(60 * ppqnDelta)/(_bps * _ppqn)
+    if _ppqnSequenceIndex < len(abchelper.sequence) :
+        ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
+        tPPQN.interval=(60 * ppqnDelta)/(_bps * _ppqn)
+    else:
+        print(len(abchelper.sequence),_ppqnSequenceIndex)
+        tPPQN.cancel() 
+        tComm.cancel()
+
 
 def getComm():
     global _bps
+    global _repeat
     try:
         # Read the comm.json file to get 
         # any new data
+        # Takes about 500 microseconds i.e.  0.0005533695220947266
+        # start = time.time()
         with open("data.json","r") as comm_file:
             comm = json.load(comm_file)
             _bps= comm["bps"]
+            _repeat = comm["repeat"]
+            print("Comm:",_bps,_repeat)
+        # print(time.time() - start)
     except:
         pass
 
@@ -82,6 +98,12 @@ if __name__ == '__main__':
     parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
     args = parser.parse_args()
     _ppqn=args.ppqn
+    # Get inition playing info
+    with open("data.json","r") as comm_file:
+        comm = json.load(comm_file)
+        _bps= comm["bps"]
+        _repeat = comm["repeat"]
+        print("Comm:",_bps,_repeat)
     with args.abcFile as abcfile:
         _abc=abcfile.read()
     abchelper=AbcHelper(_abc,_ppqn)
@@ -89,19 +111,22 @@ if __name__ == '__main__':
     #Really we are making a thread and controlling it
     # tPPQN is invoked every ppqn action in the abchelper.sequence
     # do the first ppqn action at the first ppqn value in the sequence (Then adjust as we go on)
-    firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bps*_ppqn))
-    print(firstPPQNInterval)
-    tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
-    # tComm runns periodically to get any new communication and apply it
-    tComm = RepeatTimer(1,getComm)
-    print('threading started')
-    tPPQN.start() 
-    tComm.start()
+    while _cycle==0 or _repeat:
+        _ppqnSequenceIndex = 0
+        firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bps*_ppqn))
+        print(firstPPQNInterval)
+        tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
+        # tComm runs periodically to get any new communication and apply it
+        tComm = RepeatTimer(1,getComm)
+        print('threading started')
+        tPPQN.start() 
+        tComm.start()
 
-    while True:
-        time.sleep(1)
-        
-    print('threading finishing')
+        while not tPPQN.finished.is_set():
+            time.sleep(.1)
 
-    tPPQN.cancel()
-    tComm.cancel()
+            
+        _cycle += 1
+        print('threading finished')
+
+
