@@ -1,6 +1,1 @@
-{
-    "bps": 180,
-    "repeat": false,
-    "transpose": 0,
-    "end": false
-}
+{"sequence": "blues.abc", "bps": 120, "repeat": false, "transpose": 0}

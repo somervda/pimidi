@@ -45,6 +45,7 @@ class MidiIO:
 
     cvTriggerChannel = 23
     _settings = {}
+    _quiet = True
 
     # Initialize I2C bus.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -55,18 +56,18 @@ class MidiIO:
     except:
         print("I2C device startup failed")
 
-    def __init__(self):
+    def __init__(self,quiet=True):
         # Load pimidi.config (json file)
         try:
             with open("settings.json") as settings_file:
                 self._settings = json.load(settings_file)
         except IOError as e:
-            print("I/O error({0}): {1}".format(e.strerror, e.filename))
+            not self._quiet and print("I/O error({0}): {1}".format(e.strerror, e.filename))
         self.cvSettup()
         try:
             self.conn = MidiConnector("/dev/serial0")
         except:
-            print("Midi connector setup failed")
+            not self._quiet and print("Midi connector setup failed")
         GPIO.setup(self.cvTriggerChannel,GPIO.OUT)
         GPIO.output(self.cvTriggerChannel,GPIO.LOW)
 
@@ -78,7 +79,7 @@ class MidiIO:
             settings_file.write(json_settings)
 
     def noteOn(self, note, channel=None, velocity=127):
-        print("note On",note)
+        not self._quiet and print("note On",note)
         if channel == None:
             channel = self.midi_default_channel
         noteOn = NoteOn(note, velocity)
@@ -92,7 +93,7 @@ class MidiIO:
             self.oledShowNoteText(note)
 
     def noteOff(self, note, channel=None, velocity=127):
-        # print("Note off",note)
+        not self._quiet and  print("Note off",note)
         if channel == None:
             channel = self.midi_default_channel
         noteOff = NoteOff(note, velocity)
@@ -107,7 +108,7 @@ class MidiIO:
 
     def cvNoteOn(self,note):
         dacValue = self.dacMidiNoteValue(note)
-        print("note/dacValue:",note,dacValue)
+        not self._quiet and print("note/dacValue:",note,dacValue)
         if (dacValue >= 0 and dacValue <= 4095):
             self.dac.raw_value= dacValue
             GPIO.output(self.cvTriggerChannel,GPIO.HIGH)
@@ -213,7 +214,7 @@ class MidiIO:
             if self.cv_min_hertz > noteHertz:
                 break
         self.cv_first_midi_note = note + 1
-        print("self.cv_first_midi_note:",self.cv_first_midi_note)
+        not self._quiet and print("self.cv_first_midi_note:",self.cv_first_midi_note)
         # Find the DAC value offset to that first note by
         # stepping up the dac values until we are one semitone higher or
         # get to the first midi note frequency
@@ -223,7 +224,7 @@ class MidiIO:
             ) >= self.getMidiNoteHertz(self.cv_first_midi_note):
                 self.dacOffset = dacOffset
                 break
-        print("self.dacOffset:",self.dacOffset)
+        not self._quiet and print("self.dacOffset:",self.dacOffset)
 
     def getMidiNoteHertz(self, note):
         return self.MIDINOTE127 / (math.pow(self.etFreqRatio, 127 - note))

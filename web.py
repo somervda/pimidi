@@ -11,6 +11,7 @@ import sys
 import time
 import asyncio
 from midiio import MidiIO
+import subprocess
 
 # fastAPI 
 from typing import Union,Annotated
@@ -52,6 +53,11 @@ except:
 async def play_note(note: Annotated[int, Path(title="Midi note value",le=127)],
 durationMs:Annotated[int, Path(title="Milliseconds to play the note",ge=50,le=4000)]):
     task = asyncio.create_task(o.notePlay(note,durationMs/1000))
+    return{True}
+
+@app.get("/player")
+async def player():
+    proc = subprocess.Popen(["python","player.py","--file","sequences/summertime.abc"])
     return{True}
 
 @app.get("/midiNoteOn/{note}")

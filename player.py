@@ -42,7 +42,7 @@ def doPPQN():
     global tComm
     global _ppqn
     global _ppqnSequenceIndex
-    print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bps,len(abchelper.sequence),_transpose)
+    # print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bps,len(abchelper.sequence),_transpose)
     for action in abchelper.sequence[_ppqnSequenceIndex]['actions']:
         match action["action"]:
             case "on":
@@ -50,7 +50,7 @@ def doPPQN():
                     midoio.noteOn(action["note"] + _transpose)
             case "off":
                 midoio.noteOff(action["note"] + _transpose)
-                print("_end:",_end)
+                # print("_end:",_end)
                 if _end:
                     tPPQN.cancel() 
                     tComm.cancel()
@@ -60,7 +60,7 @@ def doPPQN():
         ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
         tPPQN.interval=(60 * ppqnDelta)/(_bps * _ppqn)
     else:
-        print(len(abchelper.sequence),_ppqnSequenceIndex)
+        # print(len(abchelper.sequence),_ppqnSequenceIndex)
         tPPQN.cancel() 
         tComm.cancel()
 
@@ -90,7 +90,7 @@ class RepeatTimer(Timer):
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args,**self.kwargs)
-        print('Done')
+        # print('Done')
     
 def getComm():
     global _bps
@@ -133,11 +133,11 @@ if __name__ == '__main__':
         _transpose = _pendingTranspose
         _ppqnSequenceIndex = 0
         firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bps*_ppqn))
-        print(firstPPQNInterval)
+        # print(firstPPQNInterval)
         tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
         # tComm runs periodically to get any new communication and apply it
         tComm = RepeatTimer(.1,updateComm)
-        print('threading started')
+        # print('threading started')
         tPPQN.start() 
         tComm.start()
 
@@ -146,6 +146,6 @@ if __name__ == '__main__':
 
             
         _cycle += 1
-        print('threading finished')
+        # print('threading finished')
 
 
