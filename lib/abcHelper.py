@@ -40,7 +40,6 @@ class AbcHelper:
         # Convert the abc notation to a sequence
         # Read each character until start is found
         
-
         for abcChar in self._abc:
             # Skip over bar and blank space
             if abcChar not in ["|"," ",":"] :
@@ -148,6 +147,9 @@ class AbcHelper:
                                 self._noteDuration /= 8
                             else:
                                 self._noteDuration = 8
+        # Finish sequence with any outstanding notes to be played
+        self.checkForNoteWrite()
+        # Also write the final note off if needed
         if self._pendingAction != {}:
             self.addSequence([ self._pendingAction])
 

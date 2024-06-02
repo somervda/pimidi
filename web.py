@@ -9,13 +9,15 @@
 
 import sys
 import time
+import json
 import asyncio
 from midiio import MidiIO
 import subprocess
+from sequence import Sequence
 
 # fastAPI 
 from typing import Union,Annotated
-from fastapi import FastAPI,Path
+from fastapi import FastAPI,Path,Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,6 +28,7 @@ import os
 
 
 o = MidiIO()
+seq = Sequence(quiet=False)
 app = FastAPI()
 
 app.add_middleware(
@@ -46,8 +49,27 @@ try:
 except:
     print("IP address display failed")
 
+# Sequence Services
+
+@app.get("/sequence/play")
+async def sequencePlay():
+    seq.play()
+    return{True}
+
+@app.post("/sequence/")
+async def updatePlayerInfo(request: Request):
+    # Use request object to pull the post body that contains the playInfo
+    body = await request.body()
+    playInfo = json.loads(body.decode("utf-8"))
+    seq.sequenceFile = playInfo["sequenceFile"]
+    # o.repeat = True
+    seq.bps = playInfo["bps"]
+    # o.transpose = 0
+    print(playInfo)
+    return{True}
 
 
+# MIDIIO services
 
 @app.get("/playNote/{note}/{durationMs}")
 async def play_note(note: Annotated[int, Path(title="Midi note value",le=127)],
@@ -55,10 +77,6 @@ durationMs:Annotated[int, Path(title="Milliseconds to play the note",ge=50,le=40
     task = asyncio.create_task(o.notePlay(note,durationMs/1000))
     return{True}
 
-@app.get("/player")
-async def player():
-    proc = subprocess.Popen(["python","player.py","--file","sequences/summertime.abc"])
-    return{True}
 
 @app.get("/midiNoteOn/{note}")
 def midi_note_on(note: Annotated[int, Path(title="Midi note value",le=127)]):

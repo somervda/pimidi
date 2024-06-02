@@ -23,6 +23,7 @@ _onNote = 0
 _end = False
 # Pulses per quarter note
 _ppqn=32
+_abcFileName = ""
 _abc=""
 _ppqnSequenceIndex=0
 
@@ -94,17 +95,21 @@ class RepeatTimer(Timer):
     
 def getComm():
     global _bps
+    global _ppqn
     global _repeat
     global _pendingTranspose
     global _onNote
     global _end
+    global _abcFileName
     # Get playing info
     # This seems pretty quick (about 500 milliseconds when I measured it)
     # Note: When transpossing it makes sure any playing note is turned of first (Midi leaves it playing otherwise)
     try:
         with open("player.json","r") as comm_file:
             comm = json.load(comm_file)
+            _abcFileName = "sequences/" + comm["sequence"]
             _bps= comm["bps"]
+            _ppqn = comm["ppqn"]
             _repeat = comm["repeat"]
             # Transpose only done on start of a cycle
             _pendingTranspose = comm["transpose"]  
@@ -114,21 +119,23 @@ def getComm():
         pass
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser = argparse.ArgumentParser(description='Play a sequence of abc notation notes')
-    parser.add_argument('--file', dest='abcFile', help='abc notation file containing sequence to played',required=True,type=argparse.FileType('r'))
-    parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
-    args = parser.parse_args()
-    _ppqn=args.ppqn
+    # parser = argparse.ArgumentParser()
+    # parser = argparse.ArgumentParser(description='Play a sequence of abc notation notes')
+    # parser.add_argument('--file', dest='abcFile', help='abc notation file containing sequence to played',required=True,type=argparse.FileType('r'))
+    # parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
+    # args = parser.parse_args()
+    # _ppqn=args.ppqn
 
-    with args.abcFile as abcfile:
+    getComm()
+    with open( _abcFileName,"r") as abcfile:
         _abc=abcfile.read()
     abchelper=AbcHelper(_abc,_ppqn)
+    # print(_abcFileName,_ppqn,_bps,_abc,abchelper.sequence)
+
     # print(abchelper.sequence)
     #Really we are making a thread and controlling it
     # tPPQN is invoked every ppqn action in the abchelper.sequence
     # do the first ppqn action at the first ppqn value in the sequence (Then adjust as we go on)
-    getComm()
     while (_cycle==0 or _repeat) and (not _end):
         _transpose = _pendingTranspose
         _ppqnSequenceIndex = 0
