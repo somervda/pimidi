@@ -62,9 +62,9 @@ async def updatePlayerInfo(request: Request):
     body = await request.body()
     playInfo = json.loads(body.decode("utf-8"))
     seq.sequenceFile = playInfo["sequenceFile"]
-    # o.repeat = True
+    seq.repeat = playInfo["repeat"]
     seq.bps = playInfo["bps"]
-    # o.transpose = 0
+    seq.transpose = playInfo["transpose"]
     print(playInfo)
     return{True}
 

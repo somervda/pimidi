@@ -14,6 +14,9 @@ import RPi.GPIO as GPIO
 import board
 import busio
 
+# midi interface using pi-midi
+# https://github.com/edthrn/py-midi
+
 from midi import MidiConnector
 from midi import NoteOn
 from midi import NoteOff

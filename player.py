@@ -5,6 +5,7 @@
 
 import time
 import json
+import gc
 from threading import Timer
 from abcHelper import AbcHelper
 from midiio import MidiIO
@@ -27,7 +28,7 @@ _abcFileName = ""
 _abc=""
 _ppqnSequenceIndex=0
 
-midoio = MidiIO()
+midiio = MidiIO()
 
 def doPPQN():
     # do actions to be performed on the current ppqn value
@@ -43,14 +44,18 @@ def doPPQN():
     global tComm
     global _ppqn
     global _ppqnSequenceIndex
+    nstart =0
     # print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bps,len(abchelper.sequence),_transpose)
+    # Note: midiio.noteon and notoff take some time so ajust timing based on the overhead , also turn of note display setting on pymidi
+    # device, it slows down the note playing
     for action in abchelper.sequence[_ppqnSequenceIndex]['actions']:
         match action["action"]:
             case "on":
                 if not _end:
-                    midoio.noteOn(action["note"] + _transpose)
+                    nstart = time.time()
+                    midiio.noteOn(action["note"] + _transpose)
             case "off":
-                midoio.noteOff(action["note"] + _transpose)
+                midiio.noteOff(action["note"] + _transpose)
                 # print("_end:",_end)
                 if _end:
                     tPPQN.cancel() 
@@ -59,7 +64,12 @@ def doPPQN():
     # Calculate the difference between ppqn values
     if _ppqnSequenceIndex < len(abchelper.sequence) :
         ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
-        tPPQN.interval=(60 * ppqnDelta)/(_bps * _ppqn)
+        interval = (60 * ppqnDelta)/(_bps * _ppqn)  - (time.time() - nstart )
+        if interval > 0 :
+            tPPQN.interval=interval
+        else:
+            tPPQN.interval=0.001
+        # print(abchelper.sequence[_ppqnSequenceIndex]['ppqn'] ,ppqnDelta,(60 * ppqnDelta)/(_bps * _ppqn))
     else:
         # print(len(abchelper.sequence),_ppqnSequenceIndex)
         tPPQN.cancel() 
@@ -104,6 +114,7 @@ def getComm():
     # Get playing info
     # This seems pretty quick (about 500 milliseconds when I measured it)
     # Note: When transpossing it makes sure any playing note is turned of first (Midi leaves it playing otherwise)
+
     try:
         with open("player.json","r") as comm_file:
             comm = json.load(comm_file)
@@ -125,6 +136,12 @@ if __name__ == '__main__':
     # parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
     # args = parser.parse_args()
     # _ppqn=args.ppqn
+    gc.disable()
+
+    # *** Watch out for **** - displaying notes values on the pimidi device slows things down , turn this setting off 
+    #  when using the sequencer
+    midi_display_setting = midiio.midi_display
+    midiio.midi_display = False
 
     getComm()
     with open( _abcFileName,"r") as abcfile:
@@ -149,10 +166,12 @@ if __name__ == '__main__':
         tComm.start()
 
         while not tPPQN.finished.is_set():
-            time.sleep(.1)
+            time.sleep(.01)
 
             
         _cycle += 1
         # print('threading finished')
+
+    midiio.midi_display = midi_display_setting
 
 
