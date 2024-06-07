@@ -1,7 +1,1 @@
-{
-    "sequence": "otr.abc",
-    "ppqn": 16,
-    "bps": 300,
-    "repeat": false,
-    "transpose": 0
-}
+{"sequence": "otr.abc", "ppqn": 64, "bps": 200, "repeat": true, "transpose": 0}

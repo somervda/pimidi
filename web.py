@@ -56,6 +56,55 @@ async def sequencePlay():
     seq.play()
     return{True}
 
+@app.get("/sequence/sequencefile/{sequenceFile}")
+async def sequencefile(sequenceFile: Annotated[str, Path(title="Sequence File Name")]):
+    seq.sequenceFile = sequenceFile
+    return{True}
+
+@app.get("/sequence/bps/{bps}")
+async def setBBS(bps: Annotated[int, Path(title="Beats per second",ge=30,le=800)]):
+    seq.bps = bps
+    return{True}
+
+@app.get("/sequence/ppqn/{ppqn}")
+async def setPPQN(ppqn: Annotated[int, Path(title="Pulses per Quarter Note",ge=8,le=128)]):
+    seq.ppqn = ppqn
+    return{True}
+
+@app.get("/sequence/repeat/{repeat}")
+async def setRepeat(repeat: Annotated[int, Path(title="Repeat sequence (0=Off,1=On)",ge=0,le=1)]):
+    if repeat==0:
+        seq.repeat = False
+    else:
+        seq.repeat = True
+    return{True}
+
+@app.get("/sequence/stop")
+async def sequenceStop():
+    seq.end = True
+    return{True}
+
+@app.get("/sequences")
+async def sequences():
+    return seq.getSequences()
+
+@app.get("/sequence/{name}")
+async def getSequence(name: Annotated[str, Path(title="Sequence File Name")]):
+    return seq.getSequence(name)
+
+@app.delete("/sequence/{name}")
+async def removeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
+    return seq.removeSequence(name)
+
+@app.post("/sequence/{name}")
+async def writeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
+    # Use request object to pull the post body that contains the schema
+    sequence = await request.body()
+    sequence = schema.decode("utf-8")
+    print(sequence)
+    return seq.writeSequence(name,sequence)
+
+
 @app.post("/sequence/")
 async def updatePlayerInfo(request: Request):
     # Use request object to pull the post body that contains the playInfo
@@ -124,7 +173,7 @@ def midi_note_reset():
 
 @app.get("/cvSetValue/{value}/{on}")
 def cv_set_value(value: Annotated[int, Path(title="DAC value",le=4095,ge=0)],
-    on: Annotated[int, Path(title="Trigger on of off (0,1)",ge=0,le=1)]):
+    on: Annotated[int, Path(title="Trigger on or off (0,1)",ge=0,le=1)]):
     # Turn on or off cv based on a DAC VALUE
     if on==1:
         o.cvSetValue(value,True)

@@ -9,8 +9,9 @@ import gc
 from threading import Timer
 from abcHelper import AbcHelper
 from midiio import MidiIO
+from sequence import Sequence
 
-import argparse
+# import argparse
 
 
 
@@ -29,6 +30,7 @@ _abc=""
 _ppqnSequenceIndex=0
 
 midiio = MidiIO()
+sequence = Sequence()
 
 def doPPQN():
     # do actions to be performed on the current ppqn value
@@ -173,5 +175,6 @@ if __name__ == '__main__':
         # print('threading finished')
 
     midiio.midi_display = midi_display_setting
+    sequence.end=False
 
 
