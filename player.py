@@ -25,7 +25,6 @@ _onNote = 0
 _end = False
 # Pulses per quarter note
 _ppqn=32
-_abcFileName = ""
 _abc=""
 _ppqnSequenceIndex=0
 
@@ -112,7 +111,6 @@ def getComm():
     global _pendingTranspose
     global _onNote
     global _end
-    global _abcFileName
     # Get playing info
     # This seems pretty quick (about 500 milliseconds when I measured it)
     # Note: When transpossing it makes sure any playing note is turned of first (Midi leaves it playing otherwise)
@@ -146,7 +144,7 @@ if __name__ == '__main__':
     midiio.midi_display = False
 
     getComm()
-    with open( _abcFileName,"r") as abcfile:
+    with open( "sequences/default.abc","r") as abcfile:
         _abc=abcfile.read()
     abchelper=AbcHelper(_abc,_ppqn)
     # print(_abcFileName,_ppqn,_bps,_abc,abchelper.sequence)

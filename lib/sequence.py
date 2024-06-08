@@ -7,7 +7,6 @@ import os
 
 class Sequence:
     _quiet = True
-    _sequenceFile = ""
     _bps = 120  # bps
     _repeat = False
     _transpose = 0
@@ -24,7 +23,6 @@ class Sequence:
     def getPlayerInfo(self):
         with open("player.json","r") as player_file:
             playerInfo = json.load(player_file)
-            self._sequenceFile = playerInfo["sequence"]
             self._bps= playerInfo["bps"]
             self._ppqn = playerInfo["ppqn"]
             self._repeat = playerInfo["repeat"]
@@ -38,7 +36,6 @@ class Sequence:
 
     def writePlayerInfo(self):
         playerInfo = {}
-        playerInfo["sequence"] = self._sequenceFile
         playerInfo["ppqn"] = self._ppqn
         playerInfo["bps"] = self._bps
         playerInfo["repeat"] = self._repeat
@@ -71,15 +68,7 @@ class Sequence:
 
     # *********  Getters &  Setters  ********
 
-    @property
-    def sequenceFile(self): 
-        return self._sequenceFile
-
-    @sequenceFile.setter
-    def sequenceFile(self,file):
-        self._sequenceFile = file
-        self.writePlayerInfo()
-    
+   
     @property
     def ppqn(self): 
         return self._ppqn

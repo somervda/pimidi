@@ -56,11 +56,6 @@ async def sequencePlay():
     seq.play()
     return{True}
 
-@app.get("/sequence/sequencefile/{sequenceFile}")
-async def sequencefile(sequenceFile: Annotated[str, Path(title="Sequence File Name")]):
-    seq.sequenceFile = sequenceFile
-    return{True}
-
 @app.get("/sequence/bps/{bps}")
 async def setBBS(bps: Annotated[int, Path(title="Beats per second",ge=30,le=800)]):
     seq.bps = bps
@@ -110,7 +105,6 @@ async def updatePlayerInfo(request: Request):
     # Use request object to pull the post body that contains the playInfo
     body = await request.body()
     playInfo = json.loads(body.decode("utf-8"))
-    seq.sequenceFile = playInfo["sequenceFile"]
     seq.repeat = playInfo["repeat"]
     seq.bps = playInfo["bps"]
     seq.transpose = playInfo["transpose"]
