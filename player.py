@@ -114,18 +114,16 @@ def getComm():
     # Get playing info
     # This seems pretty quick (about 500 milliseconds when I measured it)
     # Note: When transpossing it makes sure any playing note is turned of first (Midi leaves it playing otherwise)
-
     try:
         with open("player.json","r") as comm_file:
             comm = json.load(comm_file)
-            _abcFileName = "sequences/" + comm["sequence"]
-            _bps= comm["bps"]
-            _ppqn = comm["ppqn"]
-            _repeat = comm["repeat"]
-            # Transpose only done on start of a cycle
-            _pendingTranspose = comm["transpose"]  
-            _end = comm["end"]
-            # print("Comm:",_bps,_repeat,_transpose,_end)
+            _bps= comm.get("bps",60)
+            _ppqn = comm.get("ppqn",64)
+            _repeat = comm.get("repeat",False)
+            # Transpose only done on start of a cycle[]
+            _pendingTranspose = comm.get("transpose",0) 
+            _end = comm.get("end",False)
+            # print("Comm:",comm)
     except:
         pass
 
@@ -137,6 +135,7 @@ if __name__ == '__main__':
     # args = parser.parse_args()
     # _ppqn=args.ppqn
     gc.disable()
+    sequence.end=False
 
     # *** Watch out for **** - displaying notes values on the pimidi device slows things down , turn this setting off 
     #  when using the sequencer
@@ -170,7 +169,8 @@ if __name__ == '__main__':
 
             
         _cycle += 1
-        # print('threading finished')
+        # print(sequence.isPlaying())
+
 
     midiio.midi_display = midi_display_setting
     sequence.end=False

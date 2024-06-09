@@ -83,9 +83,14 @@ async def sequenceStop():
 async def sequences():
     return seq.getSequences()
 
+@app.get("/sequence/isPlaying")
+async def isPlaying():
+    return seq.isPlaying()
+
 @app.get("/sequence/{name}")
 async def getSequence(name: Annotated[str, Path(title="Sequence File Name")]):
     return seq.getSequence(name)
+
 
 @app.delete("/sequence/{name}")
 async def removeSequence(name: Annotated[str, Path(title="Sequence File Name")]):

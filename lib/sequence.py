@@ -4,6 +4,7 @@ import json
 import subprocess
 import glob
 import os
+import psutil
 
 class Sequence:
     _quiet = True
@@ -32,6 +33,7 @@ class Sequence:
     def play(self):
         not self._quiet and print("play")
         self._player = subprocess.Popen(["python","player.py"])
+        print("self._palyer",self._player)
         return{True}
 
     def writePlayerInfo(self):
@@ -65,6 +67,18 @@ class Sequence:
             return True
         except:
             return False
+
+    def isPlaying(self) :
+        # Check if there are any running scripts
+        for process in psutil.process_iter(['username','cmdline','pid']):
+            if process.info["username"] == "pi":
+                cmdline = process.info["cmdline"]
+                if cmdline is not None:
+                    if len(cmdline)>=2:
+                        if cmdline[1] == "player.py":
+                            return (True)
+        return (False)
+
 
     # *********  Getters &  Setters  ********
 

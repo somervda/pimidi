@@ -69,6 +69,8 @@ echo 5. Install adafruit mcp4725 DAC support
 # See https://github.com/adafruit/Adafruit_CircuitPython_MCP4725 
 pip3 install adafruit-circuitpython-mcp4725  --break-system-packages
 
+pip3 install psutil --break-system-packages
+
 echo 6. Installing midi library for python
 # Using https://github.com/edthrn/py-midi 
 pip install py-midi  --break-system-packages
