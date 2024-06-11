@@ -14,6 +14,8 @@ class Sequence:
     _player = None
     _ppqn = 64
     _end = False
+    # Default abc notation used by the player
+    _abcDefault = ""
     
 
     def __init__(self,quiet=True):
@@ -33,8 +35,8 @@ class Sequence:
     def play(self):
         not self._quiet and print("play")
         self._player = subprocess.Popen(["python","player.py"])
-        print("self._palyer",self._player)
-        return{True}
+        print("self._player",self._player)
+        return (True)
 
     def writePlayerInfo(self):
         playerInfo = {}
@@ -82,10 +84,21 @@ class Sequence:
 
     # *********  Getters &  Setters  ********
 
+    @property
+    def abcDefault(self): 
+        return self._abcDefault
    
+    @abcDefault.setter
+    def abcDefault(self, abcDefault=""):
+        self._abcDefault = abcDefault
+        with open("sequences/default.abc" ,"w") as sequence_file:
+            return sequence_file.write(self._abcDefault)
+
+
     @property
     def ppqn(self): 
         return self._ppqn
+
 
     @ppqn.setter
     def bps(self, ppqn=64):

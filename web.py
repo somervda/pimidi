@@ -51,10 +51,10 @@ except:
 
 # Sequence Services
 
-@app.get("/sequence/play")
-async def sequencePlay():
-    seq.play()
-    return{True}
+# @app.get("/sequence/play")
+# async def sequencePlay():
+#     seq.play()
+#     return{True}
 
 @app.get("/sequence/bps/{bps}")
 async def setBBS(bps: Annotated[int, Path(title="Beats per second",ge=30,le=800)]):
@@ -64,6 +64,11 @@ async def setBBS(bps: Annotated[int, Path(title="Beats per second",ge=30,le=800)
 @app.get("/sequence/ppqn/{ppqn}")
 async def setPPQN(ppqn: Annotated[int, Path(title="Pulses per Quarter Note",ge=8,le=128)]):
     seq.ppqn = ppqn
+    return{True}
+
+@app.get("/sequence/transpose/{transpose}")
+async def setPPQN(transpose: Annotated[int, Path(title="Transpose sequence by n semitones",ge=-12,le=12)]):
+    seq.transpose = transpose
     return{True}
 
 @app.get("/sequence/repeat/{repeat}")
@@ -96,6 +101,23 @@ async def getSequence(name: Annotated[str, Path(title="Sequence File Name")]):
 async def removeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
     return seq.removeSequence(name)
 
+
+
+@app.post("/sequence/play")
+async def sequencePlay(request: Request):
+    # Use request object to pull the post body that contains the playInfo
+    # Save the data to player.json and the default.abc files then start the player
+    body = await request.body()
+    playInfo = json.loads(body.decode("utf-8"))
+    seq.repeat = playInfo.get("repeat", False)
+    seq.bps = playInfo.get("bps",60)
+    seq.transpose = playInfo.get("transpose",0)
+    # Save the abc based sequence to default.abc
+    seq.abcDefault = playInfo.get("abcDefault","")
+    # Start the player
+    seq.play()
+    return (True)
+
 @app.post("/sequence/{name}")
 async def writeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
     # Use request object to pull the post body that contains the schema
@@ -103,19 +125,6 @@ async def writeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
     sequence = schema.decode("utf-8")
     print(sequence)
     return seq.writeSequence(name,sequence)
-
-
-@app.post("/sequence/")
-async def updatePlayerInfo(request: Request):
-    # Use request object to pull the post body that contains the playInfo
-    body = await request.body()
-    playInfo = json.loads(body.decode("utf-8"))
-    seq.repeat = playInfo["repeat"]
-    seq.bps = playInfo["bps"]
-    seq.transpose = playInfo["transpose"]
-    print(playInfo)
-    return{True}
-
 
 # MIDIIO services
 
