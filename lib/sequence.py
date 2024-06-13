@@ -145,6 +145,9 @@ class Sequence:
         self.getPlayerInfo()
         self._end = end
         self.writePlayerInfo()
+        # Special for end logic, write out end to player.json
+        # but reset _end value after that
+        self._end = False
 
 
 
