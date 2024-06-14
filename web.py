@@ -11,6 +11,7 @@ import sys
 import time
 import json
 import asyncio
+import os.path
 from midiio import MidiIO
 import subprocess
 from sequence import Sequence
@@ -94,7 +95,11 @@ async def isPlaying():
 
 @app.get("/sequence/{name}")
 async def getSequence(name: Annotated[str, Path(title="Sequence File Name")]):
-    return seq.getSequence(name)
+    # Check if file exists first
+    if os.path.isfile("sequences/" + name):
+        return seq.getSequence(name)
+    else:
+        return ""
 
 
 @app.delete("/sequence/{name}")
@@ -118,13 +123,13 @@ async def sequencePlay(request: Request):
     seq.play()
     return (True)
 
-@app.post("/sequence/{name}")
-async def writeSequence(name: Annotated[str, Path(title="Sequence File Name")]):
-    # Use request object to pull the post body that contains the schema
-    sequence = await request.body()
-    sequence = schema.decode("utf-8")
-    print(sequence)
-    return seq.writeSequence(name,sequence)
+@app.post("/sequence/save/{name}")
+async def saveSequence(name: Annotated[str, Path(title="Sequence File Name")],request:Request):
+    # Use request object to pull the post body that contains the abcSequence
+    body = await request.body()
+    body = json.loads(body.decode("utf-8"))
+    print(body)
+    return seq.writeSequence(name,body.get("abcSequence",""))
 
 # MIDIIO services
 
