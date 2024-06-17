@@ -16,7 +16,7 @@ from sequence import Sequence
 
 
 
-_bps=80
+_bpm=80
 _repeat = False
 _cycle= 0
 _transpose = 0
@@ -35,7 +35,7 @@ def doPPQN():
     # do actions to be performed on the current ppqn value
     # then read the next ppqn value and set the timer interval to the
     # interval until the next ppqn value
-    global _bps
+    global _bpm
     global _transpose
     global _pendingTranspose
     global _end
@@ -46,7 +46,7 @@ def doPPQN():
     global _ppqn
     global _ppqnSequenceIndex
     nstart =0
-    # print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bps,len(abchelper.sequence),_transpose)
+    # print(tPPQN.interval,abchelper.sequence[_ppqnSequenceIndex]['actions'],time.time(),_ppqnSequenceIndex,_bpm,len(abchelper.sequence),_transpose)
     # Note: midiio.noteon and notoff take some time so ajust timing based on the overhead , also turn of note display setting on pymidi
     # device, it slows down the note playing
     for action in abchelper.sequence[_ppqnSequenceIndex]['actions']:
@@ -60,36 +60,28 @@ def doPPQN():
                 # print("_end:",_end)
                 if _end:
                     tPPQN.cancel() 
-                    tComm.cancel()
+                    tSettings.cancel()
     _ppqnSequenceIndex+=1
     # Calculate the difference between ppqn values
     if _ppqnSequenceIndex < len(abchelper.sequence) :
         ppqnDelta = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] - abchelper.sequence[_ppqnSequenceIndex-1]['ppqn']
-        interval = (60 * ppqnDelta)/(_bps * _ppqn)  - (time.time() - nstart )
+        interval = (60 * ppqnDelta)/(_bpm * _ppqn)  - (time.time() - nstart )
         if interval > 0 :
             tPPQN.interval=interval
         else:
             tPPQN.interval=0.001
-        # print(abchelper.sequence[_ppqnSequenceIndex]['ppqn'] ,ppqnDelta,(60 * ppqnDelta)/(_bps * _ppqn))
+        # print(abchelper.sequence[_ppqnSequenceIndex]['ppqn'] ,ppqnDelta,(60 * ppqnDelta)/(_bpm * _ppqn))
     else:
         # print(len(abchelper.sequence),_ppqnSequenceIndex)
         tPPQN.cancel() 
-        tComm.cancel()
+        tSettings.cancel()
 
 
 
-def updateComm():
-    getComm()
+def getRunningSettings():
+    getJson()
 
 
-
-
-# def writeComm(beat):
-#     # write an updated comm.json file
-#     with open("comm.json","w") as comm_file:
-#         comm={}
-#         comm["beat"]=beat
-#         comm_file.write(json.dumps(comm))
 
 
 #Interval timer
@@ -104,8 +96,8 @@ class RepeatTimer(Timer):
             self.function(*self.args,**self.kwargs)
         # print('Done')
     
-def getComm():
-    global _bps
+def getJson():
+    global _bpm
     global _ppqn
     global _repeat
     global _pendingTranspose
@@ -117,7 +109,7 @@ def getComm():
     try:
         with open("player.json","r") as comm_file:
             comm = json.load(comm_file)
-            _bps= comm.get("bps",60)
+            _bpm= comm.get("bpm",60)
             _ppqn = comm.get("ppqn",64)
             _repeat = comm.get("repeat",False)
             # Transpose only done on start of a cycle[]
@@ -128,12 +120,6 @@ def getComm():
         pass
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser = argparse.ArgumentParser(description='Play a sequence of abc notation notes')
-    # parser.add_argument('--file', dest='abcFile', help='abc notation file containing sequence to played',required=True,type=argparse.FileType('r'))
-    # parser.add_argument('--ppqn', dest='ppqn', type=int, help='Parts per quarter note (ppqn) value used for quantizing the sequence timing', required=False, default=16)
-    # args = parser.parse_args()
-    # _ppqn=args.ppqn
     gc.disable()
     sequence.end=False
 
@@ -142,11 +128,15 @@ if __name__ == '__main__':
     midi_display_setting = midiio.midi_display
     midiio.midi_display = False
 
-    getComm()
+    getJson()
     with open( "sequences/default.abc","r") as abcfile:
         _abc=abcfile.read()
+    # Use abcHelper to convert the abc notation into a series of actions (That code can use)
     abchelper=AbcHelper(_abc,_ppqn)
-    # print(_abcFileName,_ppqn,_bps,_abc,abchelper.sequence)
+    # Show what is happening
+    # print(_ppqn,_bpm,_repeat,_abc)
+    # for action in abchelper.sequence:
+    #     print(action)
 
     # print(abchelper.sequence)
     #Really we are making a thread and controlling it
@@ -155,14 +145,14 @@ if __name__ == '__main__':
     while (_cycle==0 or _repeat) and (not _end):
         _transpose = _pendingTranspose
         _ppqnSequenceIndex = 0
-        firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bps*_ppqn))
+        firstPPQNInterval = abchelper.sequence[_ppqnSequenceIndex]['ppqn'] * (60/(_bpm*_ppqn))
         # print(firstPPQNInterval)
         tPPQN = RepeatTimer(firstPPQNInterval,doPPQN)
         # tComm runs periodically to get any new communication and apply it
-        tComm = RepeatTimer(.1,updateComm)
+        tSettings = RepeatTimer(.1,getRunningSettings)
         # print('threading started')
         tPPQN.start() 
-        tComm.start()
+        tSettings.start()
 
         while not tPPQN.finished.is_set():
             time.sleep(.01)

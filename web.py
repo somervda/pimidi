@@ -57,9 +57,9 @@ except:
 #     seq.play()
 #     return{True}
 
-@app.get("/sequence/bps/{bps}")
-async def setBBS(bps: Annotated[int, Path(title="Beats per second",ge=30,le=800)]):
-    seq.bps = bps
+@app.get("/sequence/bpm/{bpm}")
+async def setBBS(bpm: Annotated[int, Path(title="Beats per second",ge=30,le=800)]):
+    seq.bpm = bpm
     return{True}
 
 @app.get("/sequence/ppqn/{ppqn}")
@@ -115,7 +115,7 @@ async def sequencePlay(request: Request):
     body = await request.body()
     playInfo = json.loads(body.decode("utf-8"))
     seq.repeat = playInfo.get("repeat", False)
-    seq.bps = playInfo.get("bps",60)
+    seq.bpm = playInfo.get("bpm",60)
     seq.transpose = playInfo.get("transpose",0)
     # Save the abc based sequence to default.abc
     seq.abcDefault = playInfo.get("abcDefault","")

@@ -8,7 +8,7 @@ import psutil
 
 class Sequence:
     _quiet = True
-    _bps = 120  # bps
+    _bpm = 120  # bpm
     _repeat = False
     _transpose = 0
     _player = None
@@ -26,22 +26,20 @@ class Sequence:
     def getPlayerInfo(self):
         with open("player.json","r") as player_file:
             playerInfo = json.load(player_file)
-            self._bps= playerInfo["bps"]
+            self._bpm= playerInfo["bpm"]
             self._ppqn = playerInfo["ppqn"]
             self._repeat = playerInfo["repeat"]
             self._transpose = playerInfo["transpose"]  
             not self._quiet and print("getPlayerInfo:",playerInfo)
 
     def play(self):
-        not self._quiet and print("play")
         self._player = subprocess.Popen(["python","player.py"])
-        print("self._player",self._player)
         return (True)
 
     def writePlayerInfo(self):
         playerInfo = {}
         playerInfo["ppqn"] = self._ppqn
-        playerInfo["bps"] = self._bps
+        playerInfo["bpm"] = self._bpm
         playerInfo["repeat"] = self._repeat
         playerInfo["transpose"] = self._transpose
         if self._end:
@@ -78,6 +76,7 @@ class Sequence:
                 if cmdline is not None:
                     if len(cmdline)>=2:
                         if cmdline[1] == "player.py":
+                            # print("process:",process)
                             return (True)
         return (False)
 
@@ -101,19 +100,19 @@ class Sequence:
 
 
     @ppqn.setter
-    def bps(self, ppqn=64):
+    def bpm(self, ppqn=64):
         self.getPlayerInfo()
         self._ppqn = ppqn
         self.writePlayerInfo()
 
     @property
-    def bps(self): 
-        return self._bps
+    def bpm(self): 
+        return self._bpm
 
-    @bps.setter
-    def bps(self, bps):
+    @bpm.setter
+    def bpm(self, bpm):
         self.getPlayerInfo()
-        self._bps = bps
+        self._bpm = bpm
         self.writePlayerInfo()
 
     @property
